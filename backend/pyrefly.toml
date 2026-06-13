@@ -1,0 +1,3 @@
+[errors]
+# Suppress false positives from virtual in-memory snippets
+ignore = []

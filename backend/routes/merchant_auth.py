@@ -4,6 +4,7 @@ import uuid
 import datetime
 import jwt
 from config import Config
+import os
 
 merchant_auth_bp = Blueprint('merchant_auth_bp', __name__)
 
@@ -55,11 +56,14 @@ def merchant_signup():
 @merchant_auth_bp.route('/merchant/login', methods=['POST'])
 def merchant_login():
     data = request.json
-    email = data.get('email', 'merchant@ac.in')
-    password = data.get('password', '123456')
+    email = data.get('email', '')
+    password = data.get('password', '')
 
-    # Mock login bypass for demo
-    if email == 'merchant@ac.in' and password == '123456':
+    # Demo merchant bypass — credentials loaded from environment
+    demo_email = os.getenv('DEMO_MERCHANT_EMAIL', '')
+    demo_password = os.getenv('DEMO_MERCHANT_PASSWORD', '')
+
+    if demo_email and demo_password and email == demo_email and password == demo_password:
         # Create dummy merchant if not exists
         if not mongo.db.merchants.find_one({"email": email}):
             mongo.db.merchants.insert_one({
@@ -70,7 +74,7 @@ def merchant_login():
                 "category": "canteen",
                 "location": "Main Block"
             })
-            
+
         return jsonify({
             "message": "Login successful",
             "merchant_id": "demo_merchant_1",
