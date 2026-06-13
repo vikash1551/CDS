@@ -1,0 +1,17 @@
+Flask
+flask-cors
+Flask-PyMongo
+pymongo
+Flask-SocketIO
+requests
+google-auth
+python-dotenv
+PyJWT
+email-validator
+pydantic
+setuptools
+werkzeug
+gunicorn
+gevent
+gevent-websocket
+certifi
