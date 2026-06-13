@@ -107,7 +107,7 @@ function Orders() {
           </div>
         ) : (
           /* Order List */
-          <div className="space-y-3">
+          <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0 xl:grid-cols-3">
             {orders.map((o) => {
               const itemNames = (o.items || []).map((i: any) => i.name).join(", ");
               const emoji = o.emoji || getEmoji(o.items || []);

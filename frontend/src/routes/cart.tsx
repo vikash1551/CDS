@@ -220,7 +220,7 @@ function Cart() {
 
       {/* Sticky Checkout Bar */}
       <div
-        className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[480px] sm:max-w-[640px] border-t border-border bg-card px-4 pb-6 pt-3 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] md:pb-4"
+        className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full border-t border-border bg-card px-4 pb-6 pt-3 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] md:left-[220px] md:w-auto md:right-0 md:pb-4 lg:left-[260px] xl:left-[280px]"
         style={{ paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))" }}
       >
         <button
@@ -254,7 +254,7 @@ function Cart() {
       {/* Confirmation Popup */}
       {showConfirmCheckout && (
         <div className="fixed inset-0 z-[10000] flex items-end justify-center bg-black/50 px-4 py-8 sm:items-center">
-          <div className="w-full max-w-sm rounded-3xl bg-card p-6 shadow-2xl">
+          <div className="w-full max-w-sm rounded-3xl bg-card p-6 shadow-2xl sm:max-w-md">
             <h3 className="text-xl font-bold">Confirm Order</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               Are you sure you want to place this order for <strong>₹{total}</strong>? We will notify nearby student partners immediately.
@@ -285,7 +285,7 @@ function Cart() {
         <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center" onClick={() => setShowAddressPopup(false)}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
           <div
-            className="relative w-full max-w-[480px] rounded-t-3xl bg-card px-5 pb-8 pt-5 shadow-pop md:rounded-3xl animate-in slide-in-from-bottom-4 fade-in duration-300"
+            className="relative w-full max-w-[480px] rounded-t-3xl bg-card px-5 pb-8 pt-5 shadow-pop md:max-w-lg md:rounded-3xl animate-in slide-in-from-bottom-4 fade-in duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">

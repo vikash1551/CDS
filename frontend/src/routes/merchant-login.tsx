@@ -3,13 +3,12 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { 
-  Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone, Shield, Store, GraduationCap, ShieldCheck, LockKeyhole, ArrowLeft 
+  Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone, Shield, Store, ShieldCheck, LockKeyhole, ArrowLeft, Package
 } from "lucide-react";
 import { CustomLogo } from "@/components/Logo";
-import campusWelcomeImg from "../campus_welcome.png";
 import merchantWelcomeImg from "../merchant_welcome.png";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/merchant-login")({
   validateSearch: (search: Record<string, unknown>) => {
     return {
       mode: (search.mode as "login" | "signup") || "login",
@@ -18,21 +17,18 @@ export const Route = createFileRoute("/login")({
   },
   head: () => ({
     meta: [
-      { title: "Welcome to UniDrop" },
-      { name: "description", content: "Campus logistics & resource sharing network. Order, borrow, and deliver on campus." },
+      { title: "Merchant Portal — UniDrop" },
+      { name: "description", content: "UniDrop merchant access. Manage your campus store, orders, and deliveries." },
     ],
   }),
-  component: Login,
+  component: MerchantLogin,
 });
 
-function Login() {
+function MerchantLogin() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const [showForm, setShowForm] = useState(search.showForm || false);
   const [mode, setMode] = useState<"login" | "signup">(search.mode || "login");
-  const [role, setRole] = useState<"student" | "merchant">("student");
-  const isMerchant = role === "merchant";
-  const welcomeImage = isMerchant ? merchantWelcomeImg : campusWelcomeImg;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -86,7 +82,7 @@ function Login() {
           localStorage.setItem("auth_token", res.data.token);
           setOtpVerified(true);
           toast.success("OTP Verified!");
-          setTimeout(() => navigate({ to: "/" }), 1000);
+          setTimeout(() => navigate({ to: "/merchant" }), 1000);
         })
         .catch(() => toast.error("Invalid OTP"))
         .finally(() => setLoading(false));
@@ -106,28 +102,16 @@ function Login() {
     setLoading(true);
     try {
       if (isLogin) {
-        const endpoint = isMerchant ? "/merchant/login" : "/login";
-        const res = await api.post(endpoint, { email, password });
+        const res = await api.post("/merchant/login", { email, password });
         localStorage.setItem("auth_token", res.data.token);
         toast.success("Logged in successfully");
-        if (isMerchant) {
-          navigate({ to: "/merchant" });
-        } else {
-          navigate({ to: "/" });
-        }
+        navigate({ to: "/merchant" });
       } else {
-        const endpoint = isMerchant ? "/merchant/signup" : "/register";
-        const payload = isMerchant
-          ? { name, email, phone, password, shop_name: shopName, business_type: "canteen" }
-          : { name, email, phone, password, role: "student" };
-        const res = await api.post(endpoint, payload);
+        const payload = { name, email, phone, password, shop_name: shopName, business_type: "canteen" };
+        const res = await api.post("/merchant/signup", payload);
         localStorage.setItem("auth_token", res.data.token);
         toast.success("Account created!");
-        if (isMerchant) {
-          navigate({ to: "/merchant" });
-        } else {
-          navigate({ to: "/verify-college" });
-        }
+        navigate({ to: "/merchant" });
       }
     } catch (err: any) {
       toast.error(err.response?.data?.message || "An error occurred");
@@ -143,17 +127,17 @@ function Login() {
   };
 
   return (
-    <div className={`min-h-screen bg-background text-foreground flex items-center justify-center p-0 md:p-6 transition-colors duration-500 ${isMerchant ? "merchant-theme" : "auth-theme"}`}>
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-0 md:p-6 transition-colors duration-500 auth-theme">
       <div className="w-full max-w-[420px] md:max-w-[840px] lg:max-w-[960px] xl:max-w-[1080px] bg-card border border-border/80 md:rounded-[32px] overflow-hidden shadow-pop md:min-h-[600px] flex flex-col md:flex-row animate-in fade-in duration-300">
         
-        {/* welcome Screen (Before entering form) */}
+        {/* Welcome Screen / Illustration Panel (Left Side) */}
         {!showForm ? (
           <>
-            {/* Campus Illustration Header */}
+            {/* Campus Merchant Illustration */}
             <div className="relative h-[280px] sm:h-[320px] md:h-auto w-full md:w-1/2 shrink-0 overflow-hidden">
               <img 
-                src={welcomeImage} 
-                alt="Campus onboarding illustration" 
+                src={merchantWelcomeImg} 
+                alt="Campus Merchant onboarding illustration" 
                 className="w-full h-full object-cover"
               />
               {/* Fade out gradient at bottom of illustration (mobile only) */}
@@ -161,32 +145,35 @@ function Login() {
               {/* Fade out gradient to the right of illustration (desktop only) */}
               <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-transparent via-card/10 to-card" />
               
-              {/* Top left badge capsule */}
+              {/* Top left badge capsule with merchant label */}
               <div className="absolute top-6 left-6 flex items-center gap-1.5 rounded-xl bg-card/90 px-3.5 py-2 shadow-soft border border-border/40 backdrop-blur-sm">
                 <span className="flex h-5 w-5 items-center justify-center rounded-md bg-brand text-brand-foreground">
                   <CustomLogo className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-[10px] font-black tracking-widest text-brand">
-                  UNIDROP{isMerchant && <span className="ml-1 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded">MERCHANT</span>}
+                <span className="text-[10px] font-black tracking-widest text-brand flex items-center">
+                  UNIDROP
+                  <span className="ml-1.5 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded tracking-normal">
+                    MERCHANT
+                  </span>
                 </span>
               </div>
             </div>
 
-            {/* Bottom Panel */}
+            {/* Right Side: Authentication Panel */}
             <div className="px-6 pb-6 pt-4 md:p-10 flex-1 flex flex-col justify-between animate-in fade-in duration-300 relative">
               {/* Role Switcher */}
               <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20">
                 <div className="flex bg-secondary/80 p-0.5 rounded-full border border-border shadow-sm">
                   <button
                     type="button"
-                    className="px-3 py-1 rounded-full text-[10px] font-bold bg-brand text-brand-foreground shadow-sm cursor-default"
+                    onClick={() => navigate({ to: "/login", search: { mode, showForm: false } })}
+                    className="px-3 py-1 rounded-full text-[10px] font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-all"
                   >
                     Student
                   </button>
                   <button
                     type="button"
-                    onClick={() => navigate({ to: "/merchant-login", search: { mode, showForm: false } })}
-                    className="px-3 py-1 rounded-full text-[10px] font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-all"
+                    className="px-3 py-1 rounded-full text-[10px] font-bold bg-brand text-brand-foreground shadow-sm cursor-default"
                   >
                     Merchant
                   </button>
@@ -195,35 +182,51 @@ function Login() {
 
               <div>
                 <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground leading-snug mt-6 md:mt-4">
-                  {isMerchant ? "Grow your campus business." : "Get anything you need on campus."}
+                  Welcome back, Merchant
                 </h1>
                 <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
-                  {isMerchant 
-                    ? "Fulfill campus orders instantly with our student courier network." 
-                    : "Borrow, order, and receive in minutes. Powered by your student network."}
+                  Manage your campus store, orders, and deliveries from one place.
                 </p>
 
-                {/* Continue button */}
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="w-full bg-brand text-brand-foreground rounded-xl py-3.5 flex items-center justify-center gap-2 font-bold hover:brightness-105 active:scale-[0.98] transition-all mt-6 shadow-soft cursor-pointer animate-in fade-in animate-duration-300"
-                >
-                  {isMerchant ? <Store className="h-4.5 w-4.5" /> : <GraduationCap className="h-4.5 w-4.5" />}
-                  {isMerchant ? "Continue with Business Email" : "Continue with College Email"}
-                </button>
+                {/* Authentication Methods (Buttons) */}
+                <div className="space-y-3 mt-6">
+                  {/* Primary login button */}
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="w-full bg-brand text-brand-foreground rounded-xl py-3.5 flex items-center justify-center gap-2 font-bold hover:bg-secondary active:scale-[0.98] transition-all shadow-soft cursor-pointer text-xs"
+                  >
+                    <Store className="h-4.5 w-4.5" />
+                    Continue with Merchant Account
+                  </button>
 
-                {/* Features columns */}
+                  {/* Secondary login option */}
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="w-full bg-background border border-border hover:bg-secondary/10 hover:text-brand hover:border-brand text-foreground rounded-xl py-3.5 flex items-center justify-center gap-2 font-bold active:scale-[0.98] transition-all shadow-soft cursor-pointer text-xs"
+                  >
+                    <Mail className="h-4.5 w-4.5 text-muted-foreground group-hover:text-brand" />
+                    Merchant Email Login
+                  </button>
+                </div>
+
+                {/* Feature highlights */}
                 <div className="grid grid-cols-2 gap-2.5 mt-4">
-                  <div className="rounded-xl bg-secondary/8 border border-secondary/20 p-3.5 text-center flex flex-col items-center justify-center gap-1">
-                    <ShieldCheck className="h-4.5 w-4.5 text-brand" />
-                    <span className="text-[10px] font-bold text-foreground">
-                      Verified Students Only
+                  <div className="rounded-xl bg-secondary/8 border border-secondary/20 p-3.5 text-center flex flex-col items-center justify-center gap-1.5">
+                    <span className="text-lg">🏪</span>
+                    <span className="text-[10px] font-bold text-foreground leading-tight">
+                      Verified Campus Merchants
+                    </span>
+                    <span className="text-[8px] text-muted-foreground leading-tight">
+                      Only institution-approved merchants can access the merchant portal.
                     </span>
                   </div>
-                  <div className="rounded-xl bg-secondary/8 border border-secondary/20 p-3.5 text-center flex flex-col items-center justify-center gap-1">
-                    <LockKeyhole className="h-4.5 w-4.5 text-brand" />
-                    <span className="text-[10px] font-bold text-foreground">
-                      Secure OTP Login
+                  <div className="rounded-xl bg-secondary/8 border border-secondary/20 p-3.5 text-center flex flex-col items-center justify-center gap-1.5">
+                    <span className="text-lg">📦</span>
+                    <span className="text-[10px] font-bold text-foreground leading-tight">
+                      Manage Orders & Deliveries
+                    </span>
+                    <span className="text-[8px] text-muted-foreground leading-tight">
+                      Track incoming orders and assigned student couriers.
                     </span>
                   </div>
                 </div>
@@ -238,12 +241,12 @@ function Login() {
             </div>
           </>
         ) : (
-          /* actual Login / SignUp Form view */
+          /* Actual Login / SignUp Form View */
           <>
             {/* Left illustration on desktop, hidden on mobile */}
             <div className="relative hidden md:block md:w-1/2 shrink-0 overflow-hidden">
               <img 
-                src={welcomeImage} 
+                src={merchantWelcomeImg} 
                 alt="Campus onboarding illustration" 
                 className="w-full h-full object-cover"
               />
@@ -252,8 +255,11 @@ function Login() {
                 <span className="flex h-5 w-5 items-center justify-center rounded-md bg-brand text-brand-foreground">
                   <CustomLogo className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-[10px] font-black tracking-widest text-brand">
-                  UNIDROP{isMerchant && <span className="ml-1 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded">MERCHANT</span>}
+                <span className="text-[10px] font-black tracking-widest text-brand flex items-center">
+                  UNIDROP
+                  <span className="ml-1.5 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded tracking-normal">
+                    MERCHANT
+                  </span>
                 </span>
               </div>
             </div>
@@ -265,14 +271,14 @@ function Login() {
                 <div className="flex bg-secondary/80 p-0.5 rounded-full border border-border shadow-sm">
                   <button
                     type="button"
-                    className="px-3 py-1 rounded-full text-[10px] font-bold bg-brand text-brand-foreground shadow-sm cursor-default"
+                    onClick={() => navigate({ to: "/login", search: { mode, showForm: true } })}
+                    className="px-3 py-1 rounded-full text-[10px] font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-all"
                   >
                     Student
                   </button>
                   <button
                     type="button"
-                    onClick={() => navigate({ to: "/merchant-login", search: { mode, showForm: true } })}
-                    className="px-3 py-1 rounded-full text-[10px] font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-all"
+                    className="px-3 py-1 rounded-full text-[10px] font-bold bg-brand text-brand-foreground shadow-sm cursor-default"
                   >
                     Merchant
                   </button>
@@ -294,18 +300,21 @@ function Login() {
                     <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-brand-foreground">
                       <CustomLogo className="h-4.5 w-4.5" />
                     </span>
-                    <span className="text-sm font-bold tracking-tight">
-                      UniDrop{isMerchant && <span className="ml-1 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded">MERCHANT</span>}
+                    <span className="text-sm font-bold tracking-tight flex items-center">
+                      UniDrop
+                      <span className="ml-1.5 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded tracking-normal">
+                        MERCHANT
+                      </span>
                     </span>
                   </div>
                 </div>
 
                 {/* Title & Subtitle */}
                 <h2 className="text-xl font-bold tracking-tight">
-                  {isLogin ? "Welcome back" : isMerchant ? "Register your shop" : "Join the network"}
+                  {isLogin ? "Welcome back, Merchant" : "Register your shop"}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-1 mb-5">
-                  {isLogin ? "Sign in to continue" : "Create an account to get started"}
+                  {isLogin ? "Sign in to manage your store" : "Register your canteen or shop to start receiving orders"}
                 </p>
 
                 {/* Mode Toggle Tabs */}
@@ -328,17 +337,17 @@ function Login() {
                 {/* Form Input fields */}
                 <form onSubmit={handleSubmit} className="space-y-3.5">
                   
-                  {/* Full name (Signup only) */}
+                  {/* Owner Full name (Signup only) */}
                   {!isLogin && (
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                        {isMerchant ? "Owner Name" : "Full Name"}
+                        Owner Name
                       </label>
                       <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
                         <User className="h-4 w-4 text-muted-foreground" />
                         <input
                           type="text"
-                          placeholder={isMerchant ? "Ramesh Kumar" : "Aarav Sharma"}
+                          placeholder="Ramesh Kumar"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
@@ -348,15 +357,15 @@ function Login() {
                     </div>
                   )}
 
-                  {/* Shop Name (Merchant + Signup only) */}
-                  {!isLogin && isMerchant && (
+                  {/* Shop Name (Signup only) */}
+                  {!isLogin && (
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Shop / Canteen Name</label>
                       <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
                         <Store className="h-4 w-4 text-muted-foreground" />
                         <input
                           type="text"
-                          placeholder="Hostel Canteen · Brew Hub"
+                          placeholder="Campus Bistro / Brew Hub"
                           value={shopName}
                           onChange={(e) => setShopName(e.target.value)}
                           className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
@@ -369,13 +378,13 @@ function Login() {
                   {/* Email (with OTP badge for Signup) */}
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Email Address
+                      Merchant Email Address
                     </label>
                     <div className="flex items-center gap-2 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
                       <Mail className="h-4 w-4 text-muted-foreground" />
                       <input
                         type="email"
-                        placeholder={isMerchant ? "shop@campus.in" : "you@college.edu"}
+                        placeholder="cafeteria@merchant.college.edu"
                         value={email}
                         onChange={(e) => { setEmail(e.target.value); setOtpSent(false); setOtpVerified(false); }}
                         className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
@@ -397,6 +406,11 @@ function Login() {
                         )
                       )}
                     </div>
+                    {isLogin && (
+                      <p className="text-[9px] text-muted-foreground">
+                        Use an approved merchant address, e.g., <span className="italic">cafeteria@merchant.college.edu</span>, <span className="italic">stationery@merchant.college.edu</span>, or <span className="italic">labstore@merchant.college.edu</span>
+                      </p>
+                    )}
                   </div>
 
                   {/* OTP verify box */}
@@ -429,7 +443,7 @@ function Login() {
                   {/* Phone (Signup only) */}
                   {!isLogin && (
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Phone Number</label>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Owner Phone Number</label>
                       <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
                         <Phone className="h-4 w-4 text-muted-foreground" />
                         <span className="text-xs text-muted-foreground font-semibold">+91</span>
@@ -450,7 +464,7 @@ function Login() {
                     <div className="flex items-center justify-between">
                       <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Password</label>
                       {isLogin && (
-                        <button type="button" className="text-[10px] font-bold text-brand">
+                        <button type="button" className="text-[10px] font-bold text-brand hover:underline cursor-pointer">
                           Forgot Password?
                         </button>
                       )}
@@ -483,7 +497,7 @@ function Login() {
                           placeholder="Re-enter password"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full bg-transparent text-xs outline-none placeholder:text-[#0D746A]/60"
+                          className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
                           required
                           minLength={6}
                         />
@@ -501,7 +515,7 @@ function Login() {
                   <button
                     type="submit"
                     disabled={loading || (!isLogin && !otpVerified) || (!isLogin && password !== confirmPassword)}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-xs font-bold text-brand-foreground shadow-soft transition-all active:scale-[0.98] disabled:opacity-40 mt-4 cursor-pointer"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-xs font-bold text-brand-foreground shadow-soft transition-all active:scale-[0.98] disabled:opacity-40 mt-4 cursor-pointer hover:bg-secondary"
                   >
                     {loading ? (
                       <span className="flex gap-1">
@@ -511,7 +525,7 @@ function Login() {
                       </span>
                     ) : (
                       <>
-                        {isLogin ? "Log in" : isMerchant ? "Register Shop" : "Create Account"} 
+                        {isLogin ? "Log in as Merchant" : "Register Shop"} 
                         <ArrowRight className="h-4 w-4" />
                       </>
                     )}
@@ -529,7 +543,7 @@ function Login() {
                 <button 
                   type="button"
                   onClick={() => toast.info("Google Authentication is simulated.")}
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-2.5 text-xs font-semibold hover:bg-secondary transition-colors cursor-pointer"
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-2.5 text-xs font-semibold hover:bg-secondary/30 transition-colors cursor-pointer"
                 >
                   <svg className="h-4 w-4" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -543,12 +557,12 @@ function Login() {
 
               {/* Bottom Form Toggles */}
               <p className="mt-6 text-center text-xs text-muted-foreground">
-                {isLogin ? "New to UniDrop?" : "Already have an account?"}{" "}
+                {isLogin ? "New merchant partner?" : "Already registered your shop?"}{" "}
                 <button
                   onClick={() => { setMode(isLogin ? "signup" : "login"); resetSignup(); }}
                   className="font-bold text-brand hover:underline cursor-pointer"
                 >
-                  {isLogin ? "Create account" : "Log in"}
+                  {isLogin ? "Register your shop" : "Log in"}
                 </button>
               </p>
             </div>

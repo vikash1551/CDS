@@ -118,7 +118,7 @@ function Lend() {
         </div>
       </div>
 
-      <div className="grid gap-3 px-4 pb-6 sm:grid-cols-2 md:grid-cols-2 md:gap-4 md:px-0 lg:grid-cols-3">
+      <div className="grid gap-3 px-4 pb-6 sm:grid-cols-2 md:grid-cols-2 md:gap-4 md:px-0 lg:grid-cols-3 xl:grid-cols-4">
         {list.map((l) => (
           <div
             key={l.id}
@@ -177,7 +177,7 @@ function Lend() {
       <button
         type="button"
         onClick={() => openListModal("Lend")}
-        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] left-5 z-50 pointer-events-auto flex h-14 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-soft transition-transform active:scale-95 hover:scale-105 md:left-8"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] left-5 z-50 pointer-events-auto flex h-14 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-soft transition-transform active:scale-95 hover:scale-105 md:left-[calc(220px+2rem)] lg:left-[calc(260px+2rem)] xl:left-[calc(280px+2rem)]"
         style={{ pointerEvents: "auto" }}
       >
         <Plus className="h-5 w-5" strokeWidth={3} />
@@ -187,7 +187,7 @@ function Lend() {
       <button
         type="button"
         onClick={() => openListModal("Need")}
-        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-5 z-50 pointer-events-auto flex h-14 items-center gap-2 rounded-full bg-brand px-5 text-brand-foreground shadow-pop md:right-8 transition-transform active:scale-95 hover:scale-105"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-5 z-50 pointer-events-auto flex h-14 items-center gap-2 rounded-full bg-brand px-5 text-brand-foreground shadow-pop md:right-8 lg:right-12 transition-transform active:scale-95 hover:scale-105"
         style={{ pointerEvents: "auto" }}
       >
         <Plus className="h-5 w-5" strokeWidth={3} />

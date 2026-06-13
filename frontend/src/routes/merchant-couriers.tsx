@@ -30,7 +30,7 @@ function MerchantCouriers() {
   const filtered = filter === "all" ? couriers : couriers.filter((c) => c.status === filter);
 
   const matchGlow = (match: number) => {
-    if (match >= 90) return "ring-2 ring-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.12)]";
+    if (match >= 90) return "ring-2 ring-brand/30 shadow-[0_0_20px_rgba(22,101,52,0.12)]";
     if (match >= 80) return "ring-1 ring-amber-500/20";
     return "";
   };
@@ -49,7 +49,7 @@ function MerchantCouriers() {
 
       <div className="px-4 pt-2 pb-6">
         {/* AI Header */}
-        <div className="rounded-2xl p-4 mb-4 text-white" style={{ background: "linear-gradient(135deg, oklch(0.45 0.2 20), oklch(0.4 0.18 35))" }}>
+        <div className="rounded-2xl p-4 mb-4 text-white" style={{ background: "linear-gradient(135deg, var(--brand), var(--secondary))" }}>
           <div className="flex items-center gap-2 mb-1">
             <Zap className="h-4 w-4" />
             <span className="text-xs font-bold uppercase tracking-wider">AI Route Matching</span>
@@ -60,14 +60,14 @@ function MerchantCouriers() {
         {/* Filter */}
         <div className="flex gap-2 mb-4">
           {(["all", "available", "delivering", "offline"] as const).map((f) => (
-            <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold capitalize ${filter === f ? "bg-gradient-to-r from-red-500 to-rose-600 text-white" : "bg-secondary text-muted-foreground"}`}>
+            <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold capitalize ${filter === f ? "bg-brand text-brand-foreground" : "bg-secondary text-muted-foreground"}`}>
               {f}
             </button>
           ))}
         </div>
 
         {/* Courier Cards */}
-        <div className="space-y-3">
+        <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0 xl:grid-cols-3">
           {filtered.map((c) => (
             <div key={c.id} className={`rounded-2xl border border-border bg-card p-4 transition-all ${matchGlow(c.match)}`}>
               <div className="flex items-start gap-3">
@@ -95,8 +95,8 @@ function MerchantCouriers() {
 
                 <div className="text-right">
                   {/* AI Match Score */}
-                  <div className={`rounded-xl px-2.5 py-1.5 text-center ${c.match >= 90 ? "bg-red-500/10" : c.match >= 80 ? "bg-amber-500/10" : "bg-secondary"}`}>
-                    <p className={`text-lg font-bold ${c.match >= 90 ? "text-red-500" : c.match >= 80 ? "text-amber-600" : "text-muted-foreground"}`}>{c.match}%</p>
+                  <div className={`rounded-xl px-2.5 py-1.5 text-center ${c.match >= 90 ? "bg-brand/10" : c.match >= 80 ? "bg-amber-500/10" : "bg-secondary"}`}>
+                    <p className={`text-lg font-bold ${c.match >= 90 ? "text-brand" : c.match >= 80 ? "text-amber-600" : "text-muted-foreground"}`}>{c.match}%</p>
                     <p className="text-[8px] font-bold uppercase text-muted-foreground">AI Match</p>
                   </div>
                   <p className="mt-1 text-[10px] font-semibold text-muted-foreground flex items-center gap-0.5 justify-end">
@@ -109,7 +109,7 @@ function MerchantCouriers() {
               {c.status === "available" && (
                 <button
                   onClick={() => toast.success(`${c.name} assigned to order!`)}
-                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 py-2.5 text-xs font-bold text-white transition-transform active:scale-95"
+                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-brand py-2.5 text-xs font-bold text-brand-foreground transition-transform active:scale-95"
                 >
                   <Zap className="h-3.5 w-3.5" /> Assign Courier
                 </button>

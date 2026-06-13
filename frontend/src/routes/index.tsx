@@ -64,7 +64,7 @@ function Index() {
   return (
     <MobileShell>
       {/* Hero / location */}
-      <div className="bg-gradient-hero px-4 pb-6 pt-4 md:rounded-3xl md:px-8 md:pb-10 md:pt-8">
+      <div className="bg-gradient-hero px-4 pb-6 pt-4 md:rounded-3xl md:px-8 md:pb-10 md:pt-8 lg:px-10 lg:pb-12">
         <div className="flex items-center justify-between">
           <button onClick={() => setShowLocationPopup(true)} className="flex items-center gap-1 text-left transition-transform active:scale-95">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/10">
@@ -93,14 +93,14 @@ function Index() {
         </div>
 
         <div className="mt-5">
-          <h1 className="text-[28px] font-bold leading-tight md:text-5xl">
+          <h1 className="text-[28px] font-bold leading-tight md:text-4xl lg:text-5xl">
             Campus rush?<br />
             <span className="text-primary">We're on the way.</span>
           </h1>
-          <p className="mt-1 text-sm text-foreground/70 md:text-base">Order from canteens · Lend & borrow gear · Live tracking</p>
+          <p className="mt-1 text-sm text-foreground/70 md:text-base lg:text-lg">Order from canteens · Lend & borrow gear · Live tracking</p>
         </div>
 
-        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-card px-3 py-2.5 shadow-card md:max-w-xl md:px-4 md:py-3.5">
+        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-card px-3 py-2.5 shadow-card md:max-w-xl md:px-4 md:py-3.5 lg:max-w-2xl">
           <Search className="h-4 w-4 text-muted-foreground" />
           <input
             placeholder="Search maggi, calculator, donut…"
@@ -205,7 +205,7 @@ function Index() {
           <h2 className="text-base font-bold md:text-2xl">Shop by category</h2>
           <Link to="/store" className="text-xs font-semibold text-primary md:text-sm">See all</Link>
         </div>
-        <div className="no-scrollbar mt-3 flex gap-3 overflow-x-auto -mx-4 px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-3 sm:overflow-visible sm:px-0 md:mx-0 md:grid md:grid-cols-8 md:gap-3 md:overflow-visible md:px-0">
+        <div className="no-scrollbar mt-3 flex gap-3 overflow-x-auto -mx-4 px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-3 sm:overflow-visible sm:px-0 md:mx-0 md:grid md:grid-cols-6 md:gap-3 md:overflow-visible md:px-0 lg:grid-cols-8">
           {categories.map((c) => (
             <Link
               to="/store"
@@ -234,7 +234,7 @@ function Index() {
           </div>
           <Link to="/store" className="text-xs font-semibold text-primary md:text-sm">See all</Link>
         </div>
-        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 md:gap-5">
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4 xl:grid-cols-5">
           {products.slice(0, 4).map((p) => (
             <Link
               to="/product/$id"
@@ -285,7 +285,7 @@ function Index() {
           </div>
           <Link to="/lend" className="text-xs font-semibold text-primary md:text-sm">Open feed</Link>
         </div>
-        <div className="mt-3 grid gap-2.5 md:grid-cols-2 md:gap-4">
+        <div className="mt-3 grid gap-2.5 sm:grid-cols-2 md:gap-4 lg:grid-cols-3">
           {lendItems.slice(0, 3).map((l) => (
             <Link
               to="/lend/$id"
@@ -345,7 +345,7 @@ function Index() {
         <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center" onClick={() => setShowLocationPopup(false)}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
           <div
-            className="relative w-full max-w-[480px] rounded-t-3xl bg-card px-5 pb-8 pt-5 shadow-pop md:rounded-3xl animate-in slide-in-from-bottom-4 fade-in duration-300"
+            className="relative w-full max-w-[480px] rounded-t-3xl bg-card px-5 pb-8 pt-5 shadow-pop md:max-w-lg md:rounded-3xl animate-in slide-in-from-bottom-4 fade-in duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-1">

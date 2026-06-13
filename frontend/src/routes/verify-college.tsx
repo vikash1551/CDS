@@ -40,16 +40,37 @@ function VerifyCollege() {
       {/* Header */}
       <div className="relative overflow-hidden bg-gradient-hero px-6 pb-10 pt-12 md:px-8 md:pt-16">
         <div className="absolute -right-12 -top-12 h-52 w-52 rounded-full bg-primary/8" />
-        <div className="relative mx-auto max-w-[420px]">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand shadow-pop">
-              <Zap className="h-5 w-5 text-brand-foreground" strokeWidth={3} />
-            </span>
-            <span className="text-xl font-bold tracking-tight text-foreground">
-              UniDrop
-            </span>
+        <div className="relative mx-auto max-w-[420px] flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand shadow-pop">
+                <Zap className="h-5 w-5 text-brand-foreground" strokeWidth={3} />
+              </span>
+              <span className="text-xl font-bold tracking-tight text-foreground">
+                UniDrop
+              </span>
+            </div>
           </div>
 
+          {/* Role Switcher */}
+          <div className="flex bg-secondary/80 p-0.5 rounded-full border border-border shadow-sm">
+            <button
+              type="button"
+              className="px-3 py-1 rounded-full text-[10px] font-bold bg-brand text-brand-foreground shadow-sm cursor-default"
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/merchant-login" })}
+              className="px-3 py-1 rounded-full text-[10px] font-bold text-muted-foreground hover:text-foreground cursor-pointer transition-all"
+            >
+              Merchant
+            </button>
+          </div>
+        </div>
+
+        <div className="relative mx-auto max-w-[420px]">
           <h1 className="mt-8 text-3xl font-bold text-foreground md:text-4xl">
             {step === "college" && <>Select your college 🎓</>}
             {step === "verified" && <>You're all set ✅</>}

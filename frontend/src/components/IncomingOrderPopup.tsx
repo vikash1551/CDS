@@ -68,7 +68,7 @@ export function IncomingOrderPopup() {
   return (
     <div className="fixed inset-0 z-[100] flex items-end justify-center bg-background/80 p-4 pb-8 backdrop-blur-md transition-all duration-500 animate-in fade-in zoom-in-95">
       <div
-        className="w-full max-w-[480px] overflow-hidden rounded-[32px] border border-border bg-card shadow-[0_20px_60px_rgba(0,0,0,0.3)] transition-all duration-300"
+        className="w-full max-w-[480px] overflow-hidden rounded-[32px] border border-border bg-card shadow-[0_20px_60px_rgba(0,0,0,0.3)] transition-all duration-300 sm:max-w-[520px]"
         style={{ transform: accepted ? "scale(0.95)" : "scale(1)", opacity: accepted ? 0.8 : 1 }}
       >
         {/* Header Map Area Simulation */}

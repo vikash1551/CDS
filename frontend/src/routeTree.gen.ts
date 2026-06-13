@@ -14,6 +14,7 @@ import { Route as TrackRouteImport } from './routes/track'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as SplashRouteImport } from './routes/splash'
 import { Route as SelectRoleRouteImport } from './routes/select-role'
+import { Route as RedesignDemoRouteImport } from './routes/redesign-demo'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as NotificationsRouteImport } from './routes/notifications'
@@ -21,6 +22,7 @@ import { Route as MerchantTrackingRouteImport } from './routes/merchant-tracking
 import { Route as MerchantProfileRouteImport } from './routes/merchant-profile'
 import { Route as MerchantProductsRouteImport } from './routes/merchant-products'
 import { Route as MerchantOrdersRouteImport } from './routes/merchant-orders'
+import { Route as MerchantLoginRouteImport } from './routes/merchant-login'
 import { Route as MerchantCouriersRouteImport } from './routes/merchant-couriers'
 import { Route as MerchantAnalyticsRouteImport } from './routes/merchant-analytics'
 import { Route as MerchantRouteImport } from './routes/merchant'
@@ -60,6 +62,11 @@ const SelectRoleRoute = SelectRoleRouteImport.update({
   path: '/select-role',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RedesignDemoRoute = RedesignDemoRouteImport.update({
+  id: '/redesign-demo',
+  path: '/redesign-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -93,6 +100,11 @@ const MerchantProductsRoute = MerchantProductsRouteImport.update({
 const MerchantOrdersRoute = MerchantOrdersRouteImport.update({
   id: '/merchant-orders',
   path: '/merchant-orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchantLoginRoute = MerchantLoginRouteImport.update({
+  id: '/merchant-login',
+  path: '/merchant-login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MerchantCouriersRoute = MerchantCouriersRouteImport.update({
@@ -172,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/merchant': typeof MerchantRoute
   '/merchant-analytics': typeof MerchantAnalyticsRoute
   '/merchant-couriers': typeof MerchantCouriersRoute
+  '/merchant-login': typeof MerchantLoginRoute
   '/merchant-orders': typeof MerchantOrdersRoute
   '/merchant-products': typeof MerchantProductsRoute
   '/merchant-profile': typeof MerchantProfileRoute
@@ -179,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/profile': typeof ProfileRoute
+  '/redesign-demo': typeof RedesignDemoRoute
   '/select-role': typeof SelectRoleRoute
   '/splash': typeof SplashRoute
   '/store': typeof StoreRoute
@@ -199,6 +213,7 @@ export interface FileRoutesByTo {
   '/merchant': typeof MerchantRoute
   '/merchant-analytics': typeof MerchantAnalyticsRoute
   '/merchant-couriers': typeof MerchantCouriersRoute
+  '/merchant-login': typeof MerchantLoginRoute
   '/merchant-orders': typeof MerchantOrdersRoute
   '/merchant-products': typeof MerchantProductsRoute
   '/merchant-profile': typeof MerchantProfileRoute
@@ -206,6 +221,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/profile': typeof ProfileRoute
+  '/redesign-demo': typeof RedesignDemoRoute
   '/select-role': typeof SelectRoleRoute
   '/splash': typeof SplashRoute
   '/store': typeof StoreRoute
@@ -227,6 +243,7 @@ export interface FileRoutesById {
   '/merchant': typeof MerchantRoute
   '/merchant-analytics': typeof MerchantAnalyticsRoute
   '/merchant-couriers': typeof MerchantCouriersRoute
+  '/merchant-login': typeof MerchantLoginRoute
   '/merchant-orders': typeof MerchantOrdersRoute
   '/merchant-products': typeof MerchantProductsRoute
   '/merchant-profile': typeof MerchantProfileRoute
@@ -234,6 +251,7 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
   '/profile': typeof ProfileRoute
+  '/redesign-demo': typeof RedesignDemoRoute
   '/select-role': typeof SelectRoleRoute
   '/splash': typeof SplashRoute
   '/store': typeof StoreRoute
@@ -256,6 +274,7 @@ export interface FileRouteTypes {
     | '/merchant'
     | '/merchant-analytics'
     | '/merchant-couriers'
+    | '/merchant-login'
     | '/merchant-orders'
     | '/merchant-products'
     | '/merchant-profile'
@@ -263,6 +282,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/orders'
     | '/profile'
+    | '/redesign-demo'
     | '/select-role'
     | '/splash'
     | '/store'
@@ -283,6 +303,7 @@ export interface FileRouteTypes {
     | '/merchant'
     | '/merchant-analytics'
     | '/merchant-couriers'
+    | '/merchant-login'
     | '/merchant-orders'
     | '/merchant-products'
     | '/merchant-profile'
@@ -290,6 +311,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/orders'
     | '/profile'
+    | '/redesign-demo'
     | '/select-role'
     | '/splash'
     | '/store'
@@ -310,6 +332,7 @@ export interface FileRouteTypes {
     | '/merchant'
     | '/merchant-analytics'
     | '/merchant-couriers'
+    | '/merchant-login'
     | '/merchant-orders'
     | '/merchant-products'
     | '/merchant-profile'
@@ -317,6 +340,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/orders'
     | '/profile'
+    | '/redesign-demo'
     | '/select-role'
     | '/splash'
     | '/store'
@@ -338,6 +362,7 @@ export interface RootRouteChildren {
   MerchantRoute: typeof MerchantRoute
   MerchantAnalyticsRoute: typeof MerchantAnalyticsRoute
   MerchantCouriersRoute: typeof MerchantCouriersRoute
+  MerchantLoginRoute: typeof MerchantLoginRoute
   MerchantOrdersRoute: typeof MerchantOrdersRoute
   MerchantProductsRoute: typeof MerchantProductsRoute
   MerchantProfileRoute: typeof MerchantProfileRoute
@@ -345,6 +370,7 @@ export interface RootRouteChildren {
   NotificationsRoute: typeof NotificationsRoute
   OrdersRoute: typeof OrdersRoute
   ProfileRoute: typeof ProfileRoute
+  RedesignDemoRoute: typeof RedesignDemoRoute
   SelectRoleRoute: typeof SelectRoleRoute
   SplashRoute: typeof SplashRoute
   StoreRoute: typeof StoreRoute
@@ -390,6 +416,13 @@ declare module '@tanstack/react-router' {
       path: '/select-role'
       fullPath: '/select-role'
       preLoaderRoute: typeof SelectRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redesign-demo': {
+      id: '/redesign-demo'
+      path: '/redesign-demo'
+      fullPath: '/redesign-demo'
+      preLoaderRoute: typeof RedesignDemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -439,6 +472,13 @@ declare module '@tanstack/react-router' {
       path: '/merchant-orders'
       fullPath: '/merchant-orders'
       preLoaderRoute: typeof MerchantOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchant-login': {
+      id: '/merchant-login'
+      path: '/merchant-login'
+      fullPath: '/merchant-login'
+      preLoaderRoute: typeof MerchantLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/merchant-couriers': {
@@ -546,6 +586,7 @@ const rootRouteChildren: RootRouteChildren = {
   MerchantRoute: MerchantRoute,
   MerchantAnalyticsRoute: MerchantAnalyticsRoute,
   MerchantCouriersRoute: MerchantCouriersRoute,
+  MerchantLoginRoute: MerchantLoginRoute,
   MerchantOrdersRoute: MerchantOrdersRoute,
   MerchantProductsRoute: MerchantProductsRoute,
   MerchantProfileRoute: MerchantProfileRoute,
@@ -553,6 +594,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsRoute: NotificationsRoute,
   OrdersRoute: OrdersRoute,
   ProfileRoute: ProfileRoute,
+  RedesignDemoRoute: RedesignDemoRoute,
   SelectRoleRoute: SelectRoleRoute,
   SplashRoute: SplashRoute,
   StoreRoute: StoreRoute,

@@ -75,17 +75,17 @@ function MerchantTracking() {
     const bounds = L.latLngBounds(ROUTE);
     map.fitBounds(bounds, { padding: [50, 50] });
 
-    L.polyline(ROUTE, { color: "#ef4444", weight: 4, opacity: 0.6, dashArray: "8, 12", lineCap: "round" }).addTo(map);
+    L.polyline(ROUTE, { color: "#367588", weight: 4, opacity: 0.6, dashArray: "8, 12", lineCap: "round" }).addTo(map);
 
     const shopIcon = L.divIcon({ className: "", html: `<div style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,0.2);font-size:18px">🏪</div>`, iconSize: [36, 36], iconAnchor: [18, 18] });
     L.marker(ROUTE[0], { icon: shopIcon }).addTo(map);
 
-    const destIcon = L.divIcon({ className: "", html: `<div style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#ef4444;box-shadow:0 2px 12px rgba(239,68,68,0.4);font-size:18px;color:#fff">📍</div>`, iconSize: [36, 36], iconAnchor: [18, 18] });
+    const destIcon = L.divIcon({ className: "", html: `<div style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#367588;box-shadow:0 2px 12px rgba(54,117,136,0.4);font-size:18px;color:#fff">📍</div>`, iconSize: [36, 36], iconAnchor: [18, 18] });
     L.marker(ROUTE[ROUTE.length - 1], { icon: destIcon }).addTo(map);
 
     const runnerIcon = L.divIcon({
       className: "",
-      html: `<div style="position:relative;width:44px;height:44px"><div style="position:absolute;inset:0;border-radius:50%;background:#ef4444;opacity:0.3;animation:pulse-ring 1.8s ease infinite"></div><div style="position:absolute;inset:6px;border-radius:50%;background:#ef4444;box-shadow:0 4px 12px rgba(239,68,68,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid #fff">🚴</div></div>`,
+      html: `<div style="position:relative;width:44px;height:44px"><div style="position:absolute;inset:0;border-radius:50%;background:#5BA3B5;opacity:0.3;animation:pulse-ring 1.8s ease infinite"></div><div style="position:absolute;inset:6px;border-radius:50%;background:#367588;box-shadow:0 4px 12px rgba(54,117,136,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid #fff">🚴</div></div>`,
       iconSize: [44, 44], iconAnchor: [22, 22],
     });
     const rm = L.marker(ROUTE[4], { icon: runnerIcon, zIndexOffset: 1000 }).addTo(map);
@@ -103,7 +103,7 @@ function MerchantTracking() {
             key={d.id}
             onClick={() => setSelected(d)}
             className={`shrink-0 flex items-center gap-2 rounded-2xl border px-3 py-2 text-left transition-all ${
-              selected.id === d.id ? "border-red-500 bg-red-500/5 shadow-sm" : "border-border bg-card"
+              selected.id === d.id ? "border-brand bg-brand/5 shadow-sm" : "border-border bg-card"
             }`}
           >
             <span className="text-lg">{d.emoji}</span>
@@ -116,7 +116,7 @@ function MerchantTracking() {
       </div>
 
       {/* Map */}
-      <div className="relative mx-4 h-[300px] overflow-hidden rounded-2xl md:h-[400px]">
+      <div className="relative mx-4 h-[300px] overflow-hidden rounded-2xl md:h-[400px] lg:h-[500px] xl:h-[600px]">
         <MapContainer center={CENTER} zoom={16} tileStyle={tileStyle} hideZoomControl className="h-full w-full" onMapReady={handleMapReady} />
         <button
           onClick={() => setTileStyle((s) => (s === "streets" ? "dark" : "streets"))}
@@ -137,7 +137,7 @@ function MerchantTracking() {
             </div>
             <div className="text-right">
               <p className="text-xs font-semibold text-muted-foreground">ETA</p>
-              <p className="text-lg font-bold text-red-500">{selected.eta}</p>
+              <p className="text-lg font-bold text-brand">{selected.eta}</p>
             </div>
           </div>
 
@@ -145,8 +145,8 @@ function MerchantTracking() {
           <div className="mt-4 flex items-center gap-1">
             {stages.map((s, i) => (
               <div key={s} className="flex-1 text-center">
-                <div className={`h-2 rounded-full mb-1 transition-all ${currentStage >= i ? "bg-gradient-to-r from-red-500 to-rose-600" : "bg-border"}`} />
-                <span className={`text-[8px] font-bold ${currentStage >= i ? "text-red-500" : "text-muted-foreground"}`}>{s}</span>
+                <div className={`h-2 rounded-full mb-1 transition-all ${currentStage >= i ? "bg-brand" : "bg-border"}`} />
+                <span className={`text-[8px] font-bold ${currentStage >= i ? "text-brand" : "text-muted-foreground"}`}>{s}</span>
               </div>
             ))}
           </div>
@@ -161,7 +161,7 @@ function MerchantTracking() {
               </p>
             </div>
             <button onClick={() => {}} className="flex h-9 w-9 items-center justify-center rounded-full bg-card"><MessageCircle className="h-4 w-4" /></button>
-            <button onClick={() => {}} className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-rose-600 text-white"><Phone className="h-4 w-4" /></button>
+            <button onClick={() => {}} className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-brand-foreground"><Phone className="h-4 w-4" /></button>
           </div>
         </div>
       </div>

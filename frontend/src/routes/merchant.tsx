@@ -98,7 +98,7 @@ function Merchant() {
 
   const statusColor = (s: string) => {
     switch (s) {
-      case "new": return "bg-red-500/15 text-red-600";
+      case "new": return "bg-brand/15 text-brand";
       case "preparing": return "bg-amber-500/15 text-amber-600";
       case "picked": return "bg-blue-500/15 text-blue-600";
       default: return "bg-secondary text-foreground";
@@ -124,7 +124,7 @@ function Merchant() {
             <Link to="/merchant-orders" className="relative flex h-9 w-9 items-center justify-center rounded-full bg-secondary">
               <Bell className="h-4 w-4" />
               {totalPending > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-rose-600 text-[8px] font-bold text-white ring-2 ring-card">{totalPending}</span>
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[8px] font-bold text-brand-foreground ring-2 ring-card">{totalPending}</span>
               )}
             </Link>
           </div>
@@ -132,12 +132,12 @@ function Merchant() {
       />
 
       {/* Shop Header */}
-      <div className="px-4 pb-6 pt-3" style={{ background: "linear-gradient(135deg, oklch(0.45 0.2 20), oklch(0.35 0.18 30))" }}>
+      <div className="px-4 pb-6 pt-3 bg-brand text-brand-foreground">
         <div className="flex items-center gap-3 text-white">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-3xl ring-4 ring-white/10">🏪</div>
           <div className="flex-1">
             <p className="text-lg font-bold">Hostel Canteen</p>
-            <p className="text-[11px] opacity-70">NMIT Campus · Ramesh Kumar</p>
+            <p className="text-[11px] opacity-70">Campus · Ramesh Kumar</p>
           </div>
           <div className="flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold backdrop-blur">
             <span className={`h-1.5 w-1.5 rounded-full ${isOpen ? "bg-green-400" : "bg-red-400"}`} /> {isOpen ? "Open" : "Closed"}
@@ -145,7 +145,7 @@ function Merchant() {
         </div>
 
         {/* Stat Cards */}
-        <div className="mt-4 grid grid-cols-4 gap-2">
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {[
             { icon: <Package className="h-3 w-3" />, label: "Orders", value: ordersToday },
             { icon: <Bike className="h-3 w-3" />, label: "Active", value: activeDeliveries },
@@ -164,10 +164,10 @@ function Merchant() {
         {/* Incoming Orders */}
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold flex items-center gap-1.5">
-            <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-gradient-to-r from-red-500 to-rose-600" /></span>
+            <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-brand text-brand-foreground" /></span>
             Live Orders
           </h2>
-          <Link to="/merchant-orders" className="text-xs font-semibold text-red-500 flex items-center gap-0.5">View all <ChevronRight className="h-3 w-3" /></Link>
+          <Link to="/merchant-orders" className="text-xs font-semibold text-brand flex items-center gap-0.5">View all <ChevronRight className="h-3 w-3" /></Link>
         </div>
 
         <div className="space-y-2 mb-6">
@@ -197,7 +197,7 @@ function Merchant() {
                       toast.error("Failed to update on server");
                     }
                   }}
-                  className="rounded-xl bg-gradient-to-r from-red-500 to-rose-600 px-3 py-2 text-[10px] font-bold text-white transition-transform active:scale-95"
+                  className="rounded-xl bg-brand text-brand-foreground px-3 py-2 text-[10px] font-bold transition-transform active:scale-95"
                 >
                   Accept
                 </button>
@@ -208,11 +208,11 @@ function Merchant() {
 
         {/* Active Couriers */}
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-bold flex items-center gap-1.5"><Users className="h-4 w-4 text-red-500" /> Active Couriers</h2>
-          <Link to="/merchant-couriers" className="text-xs font-semibold text-red-500 flex items-center gap-0.5">AI Match <ChevronRight className="h-3 w-3" /></Link>
+          <h2 className="text-sm font-bold flex items-center gap-1.5"><Users className="h-4 w-4 text-brand" /> Active Couriers</h2>
+          <Link to="/merchant-couriers" className="text-xs font-semibold text-brand flex items-center gap-0.5">AI Match <ChevronRight className="h-3 w-3" /></Link>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 mb-6">
+        <div className="grid grid-cols-2 gap-2 mb-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           {couriers.map((c) => (
             <div key={c.name} className="rounded-2xl border border-border bg-card p-3 text-center">
               <span className="flex h-10 w-10 mx-auto items-center justify-center rounded-full bg-secondary text-xl">{c.avatar}</span>
@@ -220,14 +220,14 @@ function Merchant() {
               <p className="flex items-center justify-center gap-0.5 text-[10px] text-muted-foreground">
                 <Star className="h-3 w-3 fill-amber-400 text-amber-400" />{c.rating}
               </p>
-              <div className="mt-1.5 rounded-full bg-red-500/10 px-2 py-0.5 text-[9px] font-bold text-red-500">{c.match}% match</div>
+              <div className="mt-1.5 rounded-full bg-brand/10 px-2 py-0.5 text-[9px] font-bold text-brand">{c.match}% match</div>
             </div>
           ))}
         </div>
 
         {/* Quick Actions */}
         <h2 className="text-sm font-bold mb-3">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
           {[
             { label: "Manage Menu", sub: "8 items active", to: "/merchant-products", emoji: "📋" },
             { label: "Analytics", sub: "↑ 12% revenue", to: "/merchant-analytics", emoji: "📊" },

@@ -60,8 +60,8 @@ function MerchantAnalytics() {
 
       <div className="px-4 pt-2 pb-6">
         {/* Hero Stats */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          <div className="rounded-2xl p-4 text-white" style={{ background: "linear-gradient(135deg, oklch(0.45 0.2 20), oklch(0.4 0.18 35))" }}>
+        <div className="grid grid-cols-2 gap-3 mb-5 lg:grid-cols-4">
+          <div className="rounded-2xl p-4 text-white" style={{ background: "linear-gradient(135deg, var(--brand), var(--secondary))" }}>
             <IndianRupee className="h-4 w-4 opacity-70" />
             <p className="mt-2 text-2xl font-bold">₹{animatedRevenue.toLocaleString()}</p>
             <p className="text-[10px] opacity-70">This Week's Revenue</p>
@@ -70,7 +70,7 @@ function MerchantAnalytics() {
             </span>
           </div>
           <div className="rounded-2xl border border-border bg-card p-4">
-            <Package className="h-4 w-4 text-red-500" />
+            <Package className="h-4 w-4 text-brand" />
             <p className="mt-2 text-2xl font-bold">{animatedOrders}</p>
             <p className="text-[10px] text-muted-foreground">Total Orders</p>
             <span className="mt-1 inline-flex items-center gap-0.5 rounded-full bg-green-500/10 px-1.5 py-0.5 text-[9px] font-bold text-green-600">
@@ -80,7 +80,7 @@ function MerchantAnalytics() {
         </div>
 
         {/* Mini Stats Row */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
+        <div className="grid grid-cols-3 gap-2 mb-5 lg:grid-cols-6">
           <div className="rounded-2xl border border-border bg-card p-3 text-center">
             <Clock className="mx-auto h-4 w-4 text-amber-500" />
             <p className="mt-1 text-base font-bold">8m</p>
@@ -102,11 +102,11 @@ function MerchantAnalytics() {
         <div className="rounded-2xl border border-border bg-card p-4 mb-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-bold flex items-center gap-1.5">
-              <TrendingUp className="h-4 w-4 text-red-500" /> Weekly Revenue
+              <TrendingUp className="h-4 w-4 text-brand" /> Weekly Revenue
             </h3>
             <span className="text-[10px] font-semibold text-muted-foreground">₹{totalRevenue.toLocaleString()}</span>
           </div>
-          <div className="flex items-end gap-2 h-32">
+          <div className="flex items-end gap-2 h-32 lg:h-48 xl:h-56">
             {weeklyRevenue.map((d, i) => (
               <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
                 <span className="text-[9px] font-bold text-muted-foreground">₹{(d.value / 1000).toFixed(1)}k</span>
@@ -115,7 +115,7 @@ function MerchantAnalytics() {
                   style={{
                     height: `${(d.value / maxRevenue) * 100}%`,
                     minHeight: "4px",
-                    background: i === weeklyRevenue.length - 2 ? "#ef4444" : "oklch(0.55 0.22 25 / 0.3)",
+                    background: i === weeklyRevenue.length - 2 ? "var(--brand)" : "rgba(22, 101, 52, 0.3)",
                     transformOrigin: "bottom",
                     animation: `grow-bar 0.6s ease-out ${i * 0.08}s both`,
                   }}
@@ -131,7 +131,7 @@ function MerchantAnalytics() {
           <h3 className="text-sm font-bold mb-3 flex items-center gap-1.5">
             <Clock className="h-4 w-4 text-amber-500" /> Peak Order Times
           </h3>
-          <div className="flex items-end gap-[3px] h-24">
+          <div className="flex items-end gap-[3px] h-24 lg:h-36 xl:h-44">
             {hourlyOrders.map((h, i) => (
               <div key={h.hour} className="flex-1 flex flex-col items-center gap-0.5">
                 <div
@@ -139,7 +139,7 @@ function MerchantAnalytics() {
                   style={{
                     height: `${(h.count / maxOrders) * 100}%`,
                     minHeight: "3px",
-                    background: h.count >= 20 ? "#ef4444" : h.count >= 14 ? "oklch(0.55 0.22 25 / 0.45)" : "oklch(0.55 0.22 25 / 0.2)",
+                    background: h.count >= 20 ? "var(--brand)" : h.count >= 14 ? "rgba(22, 101, 52, 0.45)" : "rgba(22, 101, 52, 0.2)",
                     transformOrigin: "bottom",
                     animation: `grow-bar 0.5s ease-out ${i * 0.04}s both`,
                   }}
@@ -148,13 +148,13 @@ function MerchantAnalytics() {
               </div>
             ))}
           </div>
-          <p className="mt-2 text-[10px] text-muted-foreground text-center">🔥 Peak hours: <span className="font-bold text-red-500">12 PM – 1 PM</span> & <span className="font-bold text-red-500">5 PM – 6 PM</span></p>
+          <p className="mt-2 text-[10px] text-muted-foreground text-center">🔥 Peak hours: <span className="font-bold text-brand">12 PM – 1 PM</span> & <span className="font-bold text-brand">5 PM – 6 PM</span></p>
         </div>
 
         {/* Top Products */}
         <div className="rounded-2xl border border-border bg-card p-4">
           <h3 className="text-sm font-bold mb-3 flex items-center gap-1.5">
-            <Package className="h-4 w-4 text-red-500" /> Most Ordered
+            <Package className="h-4 w-4 text-brand" /> Most Ordered
           </h3>
           <div className="space-y-2.5">
             {topProducts.map((p, i) => (

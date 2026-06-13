@@ -255,7 +255,7 @@ def get_profile(current_user):
         user = {
             "user_id": "demo_user",
             "name": "Demo Student",
-            "email": "demo@nmit.ac.in",
+            "email": "demo@ac.in",
             "xp": 420,
             "badges": ["Speed Courier"],
             "role": "student"

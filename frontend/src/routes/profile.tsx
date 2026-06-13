@@ -122,7 +122,7 @@ function Profile() {
           </div>
         </div>
 
-        <div className="mt-4 space-y-1.5">
+        <div className="mt-4 space-y-1.5 lg:grid lg:grid-cols-2 lg:gap-2 lg:space-y-0">
           {menuItems.map((r) =>
             r.link ? (
               <Link key={r.label} to={r.link} className="w-full flex items-center text-left gap-3 rounded-2xl border border-border bg-card px-3 py-3 hover:bg-secondary/50 transition-colors">
@@ -207,7 +207,7 @@ function SettingsPanel({ user, onClose }: { user: any, onClose: () => void }) {
 
       {/* Panel */}
       <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
-        <div className="w-full max-w-[480px] sm:max-w-[640px] pointer-events-auto rounded-t-3xl border-t border-border bg-card shadow-pop animate-in slide-in-from-bottom duration-300">
+        <div className="w-full max-w-[480px] sm:max-w-[640px] md:max-w-lg pointer-events-auto rounded-t-3xl border-t border-border bg-card shadow-pop animate-in slide-in-from-bottom duration-300 md:rounded-3xl md:mb-6 md:border">
           {/* Handle + Header */}
           <div className="flex flex-col items-center pt-3 pb-2">
             <div className="h-1 w-10 rounded-full bg-border" />

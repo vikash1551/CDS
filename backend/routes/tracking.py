@@ -7,7 +7,7 @@ import datetime
 
 tracking_bp = Blueprint('tracking_bp', __name__)
 
-# Simulated campus GPS route (NMIT area)
+# Simulated campus GPS route
 CAMPUS_ROUTE = [
     {"lat": 13.0827, "lng": 80.2707, "stage": "Picked up"},
     {"lat": 13.0829, "lng": 80.2709, "stage": "En route"},

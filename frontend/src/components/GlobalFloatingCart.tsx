@@ -23,7 +23,7 @@ export function GlobalFloatingCart() {
         }
       `}</style>
       <div
-        className="fixed inset-x-0 z-50 mx-auto w-[calc(100%-2rem)] max-w-[448px] sm:max-w-[600px] md:right-8 md:left-auto md:mx-0 md:w-auto md:min-w-[280px]"
+        className="fixed inset-x-0 z-50 mx-auto w-[calc(100%-2rem)] max-w-[560px] md:right-8 md:left-auto md:mx-0 md:w-auto md:min-w-[280px] lg:right-12"
         style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom, 0px))' }}
       >
         <Link

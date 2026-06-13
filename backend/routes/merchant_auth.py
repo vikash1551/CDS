@@ -55,11 +55,11 @@ def merchant_signup():
 @merchant_auth_bp.route('/merchant/login', methods=['POST'])
 def merchant_login():
     data = request.json
-    email = data.get('email', 'merchant@nmit.ac.in')
+    email = data.get('email', 'merchant@ac.in')
     password = data.get('password', '123456')
 
     # Mock login bypass for demo
-    if email == 'merchant@nmit.ac.in' and password == '123456':
+    if email == 'merchant@ac.in' and password == '123456':
         # Create dummy merchant if not exists
         if not mongo.db.merchants.find_one({"email": email}):
             mongo.db.merchants.insert_one({

@@ -16,8 +16,8 @@ TRACKING_SCHEMA = {
     "completed_at": "datetime or null"
 }
 
-# Simulated GPS route for NMIT campus demo
-NMIT_CAMPUS_ROUTE = [
+# Simulated GPS route for campus demo
+GPS_CAMPUS_ROUTE = [
     {"lat": 13.0827, "lng": 80.2707},
     {"lat": 13.0829, "lng": 80.2709},
     {"lat": 13.0831, "lng": 80.2711},

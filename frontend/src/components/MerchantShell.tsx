@@ -18,21 +18,22 @@ export function MerchantShell({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className="min-h-screen bg-background md:flex"
+      className="min-h-screen bg-background md:flex merchant-theme text-foreground"
       style={{
-        "--color-primary": "oklch(0.55 0.22 25)",
+        "--color-primary": "#367588",
         "--color-primary-foreground": "#fff",
-        "--color-brand": "oklch(0.55 0.22 25)",
+        "--color-brand": "#367588",
         "--color-brand-foreground": "#fff",
+        "--color-ring": "#5BA3B5",
       } as React.CSSProperties}
     >
       {/* Desktop sidebar */}
-      <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:flex md:h-screen md:w-[240px] md:shrink-0 md:flex-col md:border-r md:border-border md:bg-card md:px-4 md:py-6 lg:w-[260px]">
+      <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:flex md:h-screen md:w-[220px] md:shrink-0 md:flex-col md:border-r md:border-border md:bg-card md:px-4 md:py-6 lg:w-[260px] xl:w-[280px]">
         <Link to="/merchant" className="flex items-center gap-2 px-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-brand-foreground">
             <CustomLogo className="h-5 w-5" />
           </span>
-          <span className="text-lg font-bold tracking-tight">UniDrop <span className="text-[10px] font-semibold bg-gradient-to-r from-red-500 to-rose-600 bg-clip-text text-transparent">MERCHANT</span></span>
+          <span className="text-lg font-bold tracking-tight">UniDrop <span className="text-[10px] font-semibold text-brand">MERCHANT</span></span>
         </Link>
         <nav className="mt-8 flex-1 space-y-1">
           {tabs.map((t) => {
@@ -42,7 +43,7 @@ export function MerchantShell({ children }: { children: ReactNode }) {
               <Link
                 key={t.to}
                 to={t.to}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${active ? "bg-gradient-to-r from-red-500 to-rose-600 text-white" : "text-foreground hover:bg-secondary"}`}
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${active ? "bg-brand text-brand-foreground" : "text-foreground hover:bg-secondary"}`}
               >
                 <Icon className="h-4 w-4" strokeWidth={2.4} />
                 {t.label}
@@ -62,14 +63,14 @@ export function MerchantShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 md:min-w-0 md:pl-[240px] lg:pl-[260px]">
-        <div className="mx-auto w-full max-w-[480px] pb-28 sm:max-w-[640px] md:max-w-[1240px] md:px-8 md:pb-12 md:pt-2 animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}>
+      <div className="flex-1 md:min-w-0 md:pl-[220px] lg:pl-[260px] xl:pl-[280px]">
+        <div className="mx-auto w-full max-w-none pb-28 sm:max-w-[640px] md:max-w-[1240px] md:px-8 md:pb-12 md:pt-2 lg:max-w-[1400px] lg:px-10 xl:max-w-[1600px] xl:px-12 2xl:max-w-[1800px] animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}>
           {children}
         </div>
       </div>
 
       {/* Mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[480px] sm:max-w-[640px] border-t border-border bg-card/95 px-2 pb-3 pt-2 backdrop-blur-lg md:hidden" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}>
+      <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full border-t border-border bg-card/95 px-2 pb-3 pt-2 backdrop-blur-lg md:hidden" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}>
         <ul className="flex items-center justify-between">
           {tabs.map((t) => {
             const active = isActive(t.to);
@@ -78,10 +79,10 @@ export function MerchantShell({ children }: { children: ReactNode }) {
               <li key={t.to} className="flex-1">
                 <Link
                   to={t.to}
-                  className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium ${active ? "text-red-500" : "text-muted-foreground"}`}
+                  className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium ${active ? "text-brand" : "text-muted-foreground"}`}
                 >
                   <span
-                    className={`flex h-9 w-12 items-center justify-center rounded-full transition-all ${active ? "bg-gradient-to-r from-red-500 to-rose-600 text-white" : ""}`}
+                    className={`flex h-9 w-12 items-center justify-center rounded-full transition-all ${active ? "bg-brand text-brand-foreground" : ""}`}
                   >
                     <Icon className="h-[18px] w-[18px]" strokeWidth={2.4} />
                   </span>

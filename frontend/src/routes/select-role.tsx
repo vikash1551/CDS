@@ -61,19 +61,41 @@ function SelectRole() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="relative overflow-hidden bg-gradient-primary px-6 pb-10 pt-12 md:px-8 md:pt-16">
+      <div className="relative overflow-hidden bg-gradient-primary px-6 pb-10 pt-12 md:px-8 md:pt-16 lg:px-12">
         <div className="absolute -left-10 -top-10 h-48 w-48 rounded-full bg-brand/8" />
         <div className="absolute right-0 bottom-0 h-36 w-36 rounded-full bg-brand/6" />
 
-        <div className="relative mx-auto max-w-[420px]">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand shadow-pop">
-              <Zap className="h-5 w-5 text-brand-foreground" strokeWidth={3} />
-            </span>
-            <span className="text-xl font-bold tracking-tight text-primary-foreground">
-              UniDrop
-            </span>
+        <div className="relative mx-auto max-w-[420px] md:max-w-[540px] flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand shadow-pop">
+                <Zap className="h-5 w-5 text-brand-foreground" strokeWidth={3} />
+              </span>
+              <span className="text-xl font-bold tracking-tight text-primary-foreground">
+                UniDrop
+              </span>
+            </div>
           </div>
+
+          {/* Role Switcher */}
+          <div className="flex bg-white/10 p-0.5 rounded-full border border-white/20 shadow-sm">
+            <button
+              type="button"
+              className="px-3 py-1 rounded-full text-[10px] font-bold bg-white text-primary shadow-sm cursor-default"
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/merchant-login" })}
+              className="px-3 py-1 rounded-full text-[10px] font-bold text-white/60 hover:text-white cursor-pointer transition-all"
+            >
+              Merchant
+            </button>
+          </div>
+        </div>
+
+        <div className="relative mx-auto max-w-[420px] md:max-w-[540px]">
 
           <h1 className="mt-8 text-3xl font-bold text-primary-foreground md:text-4xl">
             How will you use<br />UniDrop? 🤔
@@ -85,7 +107,7 @@ function SelectRole() {
       </div>
 
       {/* Role cards */}
-      <div className="relative -mt-5 mx-auto max-w-[420px] px-4 pb-8">
+      <div className="relative -mt-5 mx-auto max-w-[420px] md:max-w-[540px] px-4 pb-8">
         <div className="space-y-3">
           {ROLES.map((role) => {
             const active = selected === role.id;

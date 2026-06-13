@@ -155,7 +155,7 @@ function MerchantProducts() {
   return (
     <MerchantShell>
       <TopBar title="Product Menu" back={false} right={
-        <button onClick={openAdd} className="flex items-center gap-1 rounded-full bg-gradient-to-r from-red-500 to-rose-600 px-3 py-1.5 text-[11px] font-bold text-white active:scale-95">
+        <button onClick={openAdd} className="flex items-center gap-1 rounded-full bg-brand px-3 py-1.5 text-[11px] font-bold text-brand-foreground active:scale-95">
           <Plus className="h-3.5 w-3.5" /> Add
         </button>
       } />
@@ -170,14 +170,14 @@ function MerchantProducts() {
         {/* Category Chips */}
         <div className="flex gap-2 mb-4">
           {cats.map((c) => (
-            <button key={c} onClick={() => setCat(c)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold capitalize ${cat === c ? "bg-gradient-to-r from-red-500 to-rose-600 text-white" : "bg-secondary text-muted-foreground"}`}>
+            <button key={c} onClick={() => setCat(c)} className={`rounded-full px-3 py-1.5 text-[11px] font-bold capitalize ${cat === c ? "bg-brand text-brand-foreground" : "bg-secondary text-muted-foreground"}`}>
               {c}
             </button>
           ))}
         </div>
 
         {/* Product Cards */}
-        <div className="space-y-2">
+        <div className="space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
           {filtered.map((m) => (
             <div key={m.id} className={`rounded-2xl border bg-card p-3 transition-all ${!m.available ? "opacity-50 border-border" : "border-border"}`}>
               <div className="flex items-center gap-3">
@@ -192,7 +192,7 @@ function MerchantProducts() {
                   {/* Popularity bar */}
                   <div className="mt-1.5 flex items-center gap-2">
                     <div className="h-1.5 flex-1 rounded-full bg-secondary overflow-hidden">
-                      <div className="h-full rounded-full bg-gradient-to-r from-red-500 to-rose-600" style={{ width: `${m.popularity}%` }} />
+                      <div className="h-full rounded-full bg-gradient-to-r from-brand to-secondary" style={{ width: `${m.popularity}%` }} />
                     </div>
                     <span className="text-[9px] font-bold text-muted-foreground flex items-center gap-0.5"><TrendingUp className="h-2.5 w-2.5" />{m.popularity}%</span>
                   </div>
@@ -223,18 +223,18 @@ function MerchantProducts() {
 
       {/* Add/Edit Modal */}
       {showAdd && (
-        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 backdrop-blur-sm" onClick={() => setShowAdd(false)}>
-          <div className="w-full max-w-[480px] rounded-t-3xl bg-card p-5 pb-8" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 backdrop-blur-sm md:items-center" onClick={() => setShowAdd(false)}>
+          <div className="w-full max-w-[480px] rounded-t-3xl bg-card p-5 pb-8 md:max-w-lg md:rounded-3xl" onClick={(e) => e.stopPropagation()}>
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
             <h3 className="text-base font-bold mb-4">{editItem ? "Edit Item" : "Add New Item"}</h3>
             <div className="space-y-3">
               <div>
                 <label className="text-[11px] font-semibold text-muted-foreground">Item Name</label>
                 <div className="flex gap-2">
-                  <input value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="e.g. Masala Maggi" className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-rose-500" />
+                  <input value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="e.g. Masala Maggi" className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-brand" />
                   <div className="flex flex-col mt-1 w-16 relative group">
-                    <input value={formEmoji} onChange={(e) => setFormEmoji(e.target.value)} className="w-full h-full rounded-xl border border-input bg-background text-center text-xl outline-none focus:border-rose-500" />
-                    <button onClick={generateEmoji} disabled={isGenerating} className="absolute -top-6 -right-2 flex items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-rose-600 p-1.5 text-white shadow-soft transition-transform active:scale-90 hover:scale-110 disabled:opacity-50" title="Auto-generate AI Emoji">
+                    <input value={formEmoji} onChange={(e) => setFormEmoji(e.target.value)} className="w-full h-full rounded-xl border border-input bg-background text-center text-xl outline-none focus:border-brand" />
+                    <button onClick={generateEmoji} disabled={isGenerating} className="absolute -top-6 -right-2 flex items-center justify-center rounded-full bg-brand p-1.5 text-brand-foreground shadow-soft transition-transform active:scale-90 hover:scale-110 disabled:opacity-50" title="Auto-generate AI Emoji">
                       {isGenerating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
                     </button>
                   </div>
@@ -243,14 +243,14 @@ function MerchantProducts() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[11px] font-semibold text-muted-foreground">Price (₹)</label>
-                  <input type="number" value={formPrice} onChange={(e) => setFormPrice(e.target.value)} placeholder="35" className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-rose-500" />
+                  <input type="number" value={formPrice} onChange={(e) => setFormPrice(e.target.value)} placeholder="35" className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-brand" />
                 </div>
                 <div>
                   <label className="text-[11px] font-semibold text-muted-foreground">Stock</label>
-                  <input type="number" value={formStock} onChange={(e) => setFormStock(e.target.value)} placeholder="50" className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-rose-500" />
+                  <input type="number" value={formStock} onChange={(e) => setFormStock(e.target.value)} placeholder="50" className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-brand" />
                 </div>
               </div>
-              <button onClick={saveItem} className="w-full rounded-xl bg-gradient-to-r from-red-500 to-rose-600 py-3 text-sm font-bold text-white active:scale-[0.98]">
+              <button onClick={saveItem} className="w-full rounded-xl bg-brand py-3 text-sm font-bold text-brand-foreground active:scale-[0.98]">
                 {editItem ? "Save Changes" : "Add to Menu"}
               </button>
             </div>

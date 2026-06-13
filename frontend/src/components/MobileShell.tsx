@@ -25,7 +25,7 @@ export function MobileShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background md:flex">
       {/* Desktop sidebar */}
-      <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:flex md:h-screen md:w-[240px] md:shrink-0 md:flex-col md:border-r md:border-black md:bg-card md:px-4 md:py-6 lg:w-[280px]">
+      <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:flex md:h-screen md:w-[220px] md:shrink-0 md:flex-col md:border-r md:border-black md:bg-card md:px-4 md:py-6 lg:w-[260px] xl:w-[280px]">
         <Link to="/" className="flex items-center gap-2 px-2 py-1">
           <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand text-brand-foreground">
             <CustomLogo className="h-6 w-6" />
@@ -64,8 +64,8 @@ export function MobileShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main content area */}
-      <div className="flex-1 md:min-w-0 md:pl-[240px] lg:pl-[280px]">
-        <div className="mx-auto w-full max-w-[480px] pb-28 md:max-w-[1240px] md:px-8 md:pb-12 md:pt-3 sm:max-w-[640px] animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}>
+      <div className="flex-1 md:min-w-0 md:pl-[220px] lg:pl-[260px] xl:pl-[280px]">
+        <div className="mx-auto w-full max-w-none pb-28 sm:max-w-[640px] md:max-w-[1240px] md:px-8 md:pb-12 md:pt-3 lg:max-w-[1400px] lg:px-10 xl:max-w-[1600px] xl:px-12 2xl:max-w-[1800px] animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}>
           {children}
         </div>
       </div>
@@ -75,7 +75,7 @@ export function MobileShell({ children }: { children: ReactNode }) {
 
       {/* Mobile bottom nav */}
       {!hideMobileNav && (
-        <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[480px] sm:max-w-[640px] border-t border-border bg-card/95 px-2 pb-3 pt-2 backdrop-blur-lg md:hidden" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}>
+        <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full border-t border-border bg-card/95 px-2 pb-3 pt-2 backdrop-blur-lg md:hidden" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}>
           <ul className="flex items-center justify-between gap-1">
             {tabs.map((t) => {
               const active = isActive(t.to);

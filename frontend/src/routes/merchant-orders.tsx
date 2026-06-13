@@ -147,7 +147,7 @@ function MerchantOrders() {
 
   const statusBadge = (s: string) => {
     const map: Record<string, string> = {
-      new: "bg-red-500/15 text-red-600", preparing: "bg-amber-500/15 text-amber-600",
+      new: "bg-brand/15 text-brand", preparing: "bg-amber-500/15 text-amber-600",
       assigned: "bg-blue-500/15 text-blue-600", picked: "bg-violet-500/15 text-violet-600",
       delivered: "bg-green-500/15 text-green-600", rejected: "bg-gray-500/15 text-gray-500",
     };
@@ -180,7 +180,7 @@ function MerchantOrders() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold capitalize transition-all ${filter === f ? "bg-gradient-to-r from-red-500 to-rose-600 text-white" : "bg-secondary text-muted-foreground"
+              className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold capitalize transition-all ${filter === f ? "bg-brand text-brand-foreground" : "bg-secondary text-muted-foreground"
                 }`}
             >
               {f} {f !== "all" && <span className="opacity-60">({orders.filter((o) => o.status === f).length})</span>}
@@ -189,7 +189,7 @@ function MerchantOrders() {
         </div>
 
         {/* Orders List */}
-        <div className="space-y-3">
+        <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0 xl:grid-cols-3">
           {filtered.map((o, i) => {
             const isBillOpen = expandedBills.has(o.id);
             const canShowBill = o.status !== "new" && o.status !== "rejected";
@@ -197,7 +197,7 @@ function MerchantOrders() {
             return (
               <div
                 key={o.id + i}
-                className={`rounded-2xl border bg-card overflow-hidden transition-all ${o.status === "new" ? "border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.08)]" : "border-border"
+                className={`rounded-2xl border bg-card overflow-hidden transition-all ${o.status === "new" ? "border-brand/30 shadow-[0_0_20px_rgba(22,101,52,0.08)]" : "border-border"
                   }`}
                 style={{ animation: o.time === "Just now" ? "fade-up 0.4s ease-out" : undefined }}
               >
@@ -210,7 +210,7 @@ function MerchantOrders() {
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-muted-foreground">{o.id}</span>
                           <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${statusBadge(o.status)}`}>{o.status}</span>
-                          {o.urgent && <span className="rounded-full bg-gradient-to-r from-red-500 to-rose-600 px-1.5 py-0.5 text-[9px] font-bold text-white">URGENT</span>}
+                          {o.urgent && <span className="rounded-full bg-gradient-to-r from-brand to-secondary px-1.5 py-0.5 text-[9px] font-bold text-white">URGENT</span>}
                         </div>
                         <p className="text-sm font-semibold mt-0.5">{o.items}</p>
                       </div>
@@ -228,7 +228,7 @@ function MerchantOrders() {
                   {canShowBill && (
                     <div className="mt-3 flex items-center gap-1">
                       {stages.map((s, si) => (
-                        <div key={s} className={`h-1.5 flex-1 rounded-full ${stages.indexOf(o.status) >= si ? "bg-gradient-to-r from-red-500 to-rose-600" : "bg-border"}`} />
+                        <div key={s} className={`h-1.5 flex-1 rounded-full ${stages.indexOf(o.status) >= si ? "bg-brand" : "bg-border"}`} />
                       ))}
                     </div>
                   )}
@@ -236,7 +236,7 @@ function MerchantOrders() {
                   {/* Runner info */}
                   {o.runner && (
                     <div className="mt-2 flex items-center gap-2 text-[11px]">
-                      <Bike className="h-3 w-3 text-red-500" />
+                      <Bike className="h-3 w-3 text-brand" />
                       <span className="font-semibold">{o.runner}</span>
                     </div>
                   )}
@@ -246,7 +246,7 @@ function MerchantOrders() {
                     <div className="mt-3 flex gap-2">
                       <button
                         onClick={() => acceptOrder(o)}
-                        className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 py-2.5 text-xs font-bold text-white active:scale-95"
+                        className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-brand py-2.5 text-xs font-bold text-brand-foreground active:scale-95"
                       >
                         <CheckCircle2 className="h-3.5 w-3.5" /> Accept
                       </button>
@@ -262,7 +262,7 @@ function MerchantOrders() {
                   {o.status === "preparing" && (
                     <button
                       onClick={() => assignRunner(o.id)}
-                      className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-red-500/30 bg-red-500/5 py-2.5 text-xs font-bold text-red-500 active:scale-95"
+                      className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-brand/30 bg-brand/5 py-2.5 text-xs font-bold text-brand active:scale-95"
                     >
                       <Zap className="h-3.5 w-3.5" /> AI Assign Courier
                     </button>
@@ -285,7 +285,7 @@ function MerchantOrders() {
                 {isBillOpen && canShowBill && (
                   <div className="border-t border-dashed border-border bg-secondary/30 animate-bill-expand">
                     {/* Bill Header */}
-                    <div className="bg-gradient-to-r from-red-500 to-rose-600 px-4 py-3 text-white">
+                    <div className="bg-gradient-to-r from-brand to-secondary px-4 py-3 text-white">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Receipt className="h-4 w-4" />
@@ -343,13 +343,13 @@ function MerchantOrders() {
                       {/* Grand Total */}
                       <div className="flex justify-between items-center mb-4">
                         <span className="text-sm font-bold">Grand Total</span>
-                        <span className="text-lg font-bold bg-gradient-to-r from-red-500 to-rose-600 bg-clip-text text-transparent">₹{o.total}</span>
+                        <span className="text-lg font-bold bg-gradient-to-r from-brand to-secondary bg-clip-text text-transparent">₹{o.total}</span>
                       </div>
 
                       {/* Print */}
                       <button
                         onClick={() => toast.success(`Bill ${o.id} sent to printer!`)}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 py-2.5 text-xs font-bold text-white active:scale-[0.98] transition-transform"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-2.5 text-xs font-bold text-brand-foreground active:scale-[0.98] transition-transform"
                       >
                         <Printer className="h-3.5 w-3.5" /> Print Bill
                       </button>

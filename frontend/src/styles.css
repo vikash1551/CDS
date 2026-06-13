@@ -147,6 +147,8 @@
   .shadow-card { box-shadow: var(--shadow-card); }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { scrollbar-width: none; }
+  /* Responsive touch targets — ensures 44px minimum for mobile */
+  .touch-target { min-height: 44px; min-width: 44px; }
 }
 
 @keyframes pulse-ring {
@@ -167,3 +169,257 @@
   background-size: 200% 100%;
   animation: shimmer 2.2s infinite;
 }
+
+/* --- Redesign Theme Sandboxed System --- */
+.redesign-theme {
+  --radius: 1rem;
+  
+  /* Core brand and accent colors (Midnight Cobalt & Indigo-Slate) */
+  --brand: oklch(0.52 0.2 262);
+  --brand-foreground: #FFFFFF;
+  --primary: oklch(0.25 0.05 260);
+  --primary-foreground: #FFFFFF;
+  --secondary: oklch(0.96 0.01 260);
+  --secondary-foreground: oklch(0.35 0.05 260);
+  
+  --background: oklch(0.99 0.005 260);
+  --foreground: oklch(0.15 0.03 260);
+  --card: #FFFFFF;
+  --card-foreground: oklch(0.15 0.03 260);
+  --popover: #FFFFFF;
+  --popover-foreground: oklch(0.15 0.03 260);
+  
+  --muted: oklch(0.97 0.008 260);
+  --muted-foreground: oklch(0.55 0.03 260);
+  --accent: oklch(0.95 0.015 262);
+  --accent-foreground: oklch(0.25 0.05 260);
+  
+  --success: oklch(0.62 0.17 145);
+  --success-foreground: #FFFFFF;
+  --warning: oklch(0.78 0.14 75);
+  --warning-foreground: oklch(0.25 0.05 75);
+  --destructive: oklch(0.58 0.2 20);
+  --destructive-foreground: #FFFFFF;
+  
+  --border: oklch(0.92 0.01 260);
+  --input: oklch(0.94 0.01 260);
+  --ring: oklch(0.52 0.2 262);
+  
+  --surface: oklch(0.98 0.005 260);
+  --surface-2: oklch(0.95 0.01 260);
+  
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 16px -4px rgba(15, 23, 42, 0.06);
+  --shadow-pop: 0 10px 24px -6px rgba(15, 23, 42, 0.08), 0 8px 16px -6px rgba(15, 23, 42, 0.04);
+  --shadow-card: 0 0 0 1px oklch(0.92 0.01 260), 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+}
+
+.redesign-theme.dark, .redesign-theme .dark {
+  --brand: oklch(0.58 0.22 262);
+  --brand-foreground: #FFFFFF;
+  --primary: oklch(0.95 0.01 260);
+  --primary-foreground: oklch(0.12 0.02 260);
+  --secondary: oklch(0.22 0.03 260);
+  --secondary-foreground: oklch(0.85 0.02 260);
+  
+  --background: oklch(0.12 0.02 260);
+  --foreground: oklch(0.95 0.01 260);
+  --card: oklch(0.16 0.025 260);
+  --card-foreground: oklch(0.95 0.01 260);
+  --popover: oklch(0.16 0.025 260);
+  --popover-foreground: oklch(0.95 0.01 260);
+  
+  --muted: oklch(0.18 0.025 260);
+  --muted-foreground: oklch(0.65 0.02 260);
+  --accent: oklch(0.24 0.04 262);
+  --accent-foreground: oklch(0.95 0.01 260);
+  
+  --success: oklch(0.68 0.16 145);
+  --success-foreground: oklch(0.12 0.02 260);
+  --warning: oklch(0.82 0.15 75);
+  --warning-foreground: oklch(0.2 0.04 75);
+  --destructive: oklch(0.62 0.2 20);
+  --destructive-foreground: #FFFFFF;
+  
+  --border: oklch(0.22 0.03 260);
+  --input: oklch(0.24 0.03 260);
+  --ring: oklch(0.58 0.22 262);
+  
+  --surface: oklch(0.14 0.02 260);
+  --surface-2: oklch(0.18 0.025 260);
+  
+  --shadow-soft: 0 4px 20px -4px rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 12px 30px -8px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 0 0 1px oklch(0.22 0.03 260), 0 4px 12px -4px rgba(0, 0, 0, 0.3);
+}
+
+.redesign-theme .bg-background { background-color: var(--background); }
+.redesign-theme .text-foreground { color: var(--foreground); }
+.redesign-theme .bg-card { background-color: var(--card); }
+.redesign-theme .text-card-foreground { color: var(--card-foreground); }
+.redesign-theme .border-border { border-color: var(--border); }
+.redesign-theme .bg-primary { background-color: var(--primary); }
+.redesign-theme .text-primary-foreground { color: var(--primary-foreground); }
+.redesign-theme .bg-brand { background-color: var(--brand); }
+.redesign-theme .text-brand-foreground { color: var(--brand-foreground); }
+.redesign-theme .bg-secondary { background-color: var(--secondary); }
+.redesign-theme .text-secondary-foreground { color: var(--secondary-foreground); }
+.redesign-theme .bg-muted { background-color: var(--muted); }
+.redesign-theme .text-muted-foreground { color: var(--muted-foreground); }
+.redesign-theme .bg-accent { background-color: var(--accent); }
+.redesign-theme .text-accent-foreground { color: var(--accent-foreground); }
+.redesign-theme .border-input { border-color: var(--input); }
+.redesign-theme .shadow-soft { box-shadow: var(--shadow-soft); }
+.redesign-theme .shadow-pop { box-shadow: var(--shadow-pop); }
+.redesign-theme .shadow-card { box-shadow: var(--shadow-card); }
+
+/* --- Student Theme --- */
+.student-theme {
+  --radius: 1rem;
+  --brand: #0F766E; /* Primary */
+  --brand-foreground: #FFFFFF;
+  --primary: #0F766E;
+  --primary-foreground: #FFFFFF;
+  --secondary: #14B8A6; /* Secondary */
+  --secondary-foreground: #FFFFFF;
+  
+  --background: #F8FAFC; /* Background */
+  --foreground: #111827; /* Text */
+  --card: #FFFFFF; /* Cards */
+  --card-foreground: #111827;
+  
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #2DD4BF; /* Accent */
+  --success: #2DD4BF;
+  --success-foreground: #FFFFFF;
+  
+  --surface: #F8FAFC;
+  --surface-2: #F1F5F9;
+  
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 16px -4px rgba(15, 118, 110, 0.06);
+  --shadow-pop: 0 10px 24px -6px rgba(15, 118, 110, 0.08), 0 8px 16px -6px rgba(15, 118, 110, 0.04);
+  --shadow-card: 0 0 0 1px #E5E7EB, 0 2px 8px -2px rgba(15, 118, 110, 0.04);
+}
+
+.student-theme.dark, .student-theme .dark {
+  --brand: #2DD4BF; /* Accent teal in dark mode */
+  --brand-foreground: #111827;
+  --primary: #F8FAFC;
+  --primary-foreground: #0F766E;
+  --secondary: #14B8A6;
+  --secondary-foreground: #FFFFFF;
+  
+  --background: #0F172A;
+  --foreground: #F8FAFC;
+  --card: #1E293B;
+  --card-foreground: #F8FAFC;
+  
+  --border: #334155;
+  --input: #334155;
+  --ring: #2DD4BF;
+  
+  --surface: #0F172A;
+  --surface-2: #1E293B;
+}
+
+/* --- Merchant Theme --- */
+.merchant-theme {
+  --radius: 1rem;
+  --brand: #367588; /* Primary: Teal Blue */
+  --brand-foreground: #FFFFFF;
+  --primary: #367588;
+  --primary-foreground: #FFFFFF;
+  --secondary: #4C8E9E; /* Secondary: Lighter Teal Blue */
+  --secondary-foreground: #FFFFFF;
+  
+  --background: #F8FAFC;
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #5BA3B5; /* Accent */
+  --success: #5BA3B5;
+  --success-foreground: #FFFFFF;
+  
+  --surface: #F8FAFC;
+  --surface-2: #F1F5F9;
+  
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 16px -4px rgba(54, 117, 136, 0.06);
+  --shadow-pop: 0 10px 24px -6px rgba(54, 117, 136, 0.08), 0 8px 16px -6px rgba(54, 117, 136, 0.04);
+  --shadow-card: 0 0 0 1px #E5E7EB, 0 2px 8px -2px rgba(54, 117, 136, 0.04);
+}
+
+.merchant-theme.dark, .merchant-theme .dark {
+  --brand: #5BA3B5; /* Accent in dark mode */
+  --brand-foreground: #111827;
+  --primary: #F8FAFC;
+  --primary-foreground: #367588;
+  --secondary: #4C8E9E;
+  --secondary-foreground: #FFFFFF;
+  
+  --background: #0F172A;
+  --foreground: #F8FAFC;
+  --card: #1E293B;
+  --card-foreground: #F8FAFC;
+  
+  --border: #334155;
+  --input: #334155;
+  --ring: #5BA3B5;
+}
+
+/* --- Auth Theme --- */
+.auth-theme {
+  --radius: 1rem;
+  --brand: #0F766E; /* Primary */
+  --brand-foreground: #FFFFFF;
+  --primary: #0F766E;
+  --primary-foreground: #FFFFFF;
+  --secondary: #14B8A6; /* Secondary */
+  --secondary-foreground: #FFFFFF;
+  --accent: #2DD4BF; /* Accent */
+  --accent-foreground: #111827;
+  
+  --background: #F8FAFC;
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #0F766E;
+  
+  --success: #2DD4BF;
+  --success-foreground: #FFFFFF;
+  
+  --surface: #F8FAFC;
+  --surface-2: #F1F5F9;
+  
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 16px -4px rgba(15, 118, 110, 0.06);
+  --shadow-pop: 0 10px 24px -6px rgba(15, 118, 110, 0.08), 0 8px 16px -6px rgba(15, 118, 110, 0.04);
+  --shadow-card: 0 0 0 1px #E5E7EB, 0 2px 8px -2px rgba(15, 118, 110, 0.04);
+}
+
+/* Dynamic CSS class application for theme states */
+.student-theme .bg-background, .merchant-theme .bg-background, .auth-theme .bg-background { background-color: var(--background); }
+.student-theme .text-foreground, .merchant-theme .text-foreground, .auth-theme .text-foreground { color: var(--foreground); }
+.student-theme .bg-card, .merchant-theme .bg-card, .auth-theme .bg-card { background-color: var(--card); }
+.student-theme .text-card-foreground, .merchant-theme .text-card-foreground, .auth-theme .text-card-foreground { color: var(--card-foreground); }
+.student-theme .border-border, .merchant-theme .border-border, .auth-theme .border-border { border-color: var(--border); }
+.student-theme .bg-primary, .merchant-theme .bg-primary, .auth-theme .bg-primary { background-color: var(--primary); }
+.student-theme .text-primary-foreground, .merchant-theme .text-primary-foreground, .auth-theme .text-primary-foreground { color: var(--primary-foreground); }
+.student-theme .bg-brand, .merchant-theme .bg-brand, .auth-theme .bg-brand { background-color: var(--brand); }
+.student-theme .text-brand-foreground, .merchant-theme .text-brand-foreground, .auth-theme .text-brand-foreground { color: var(--brand-foreground); }
+.student-theme .bg-secondary, .merchant-theme .bg-secondary, .auth-theme .bg-secondary { background-color: var(--secondary); }
+.student-theme .text-secondary-foreground, .merchant-theme .text-secondary-foreground, .auth-theme .text-secondary-foreground { color: var(--secondary-foreground); }
+.student-theme .bg-muted, .merchant-theme .bg-muted, .auth-theme .bg-muted { background-color: var(--muted); }
+.student-theme .text-muted-foreground, .merchant-theme .text-muted-foreground, .auth-theme .text-muted-foreground { color: var(--muted-foreground); }
+.student-theme .bg-accent, .merchant-theme .bg-accent, .auth-theme .bg-accent { background-color: var(--accent); }
+.student-theme .text-accent-foreground, .merchant-theme .text-accent-foreground, .auth-theme .text-accent-foreground { color: var(--accent-foreground); }
+.student-theme .border-input, .merchant-theme .border-input, .auth-theme .border-input { border-color: var(--input); }
+.student-theme .shadow-soft, .merchant-theme .shadow-soft, .auth-theme .shadow-soft { box-shadow: var(--shadow-soft); }
+.student-theme .shadow-pop, .merchant-theme .shadow-pop, .auth-theme .shadow-pop { box-shadow: var(--shadow-pop); }
+.student-theme .shadow-card, .merchant-theme .shadow-card, .auth-theme .shadow-card { box-shadow: var(--shadow-card); }
+
+
