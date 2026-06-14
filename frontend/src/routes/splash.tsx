@@ -5,8 +5,8 @@ import { CustomLogo } from "@/components/Logo";
 export const Route = createFileRoute("/splash")({
   head: () => ({
     meta: [
-      { title: "UniDrop" },
-      { name: "description", content: "UniDrop — order, lend, and deliver across campus." },
+      { title: "Campus Flow" },
+      { name: "description", content: "Campus Flow — order, lend, and deliver across campus." },
     ],
   }),
   component: Splash,
@@ -69,7 +69,7 @@ function Splash() {
           }}
         >
           <h1 className="text-4xl font-bold tracking-tight text-primary-foreground">
-            UniDrop
+            Campus Flow
           </h1>
           <p className="mt-2 text-sm font-medium text-primary-foreground/60">
             Order · Lend · Deliver

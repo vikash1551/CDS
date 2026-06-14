@@ -19,8 +19,8 @@ export const Route = createFileRoute("/merchant-login")({
   },
   head: () => ({
     meta: [
-      { title: "Merchant Portal — UniDrop" },
-      { name: "description", content: "UniDrop merchant access. Manage your campus store, orders, and deliveries." },
+      { title: "Merchant Portal — Campus Flow" },
+      { name: "description", content: "Campus Flow merchant access. Manage your campus store, orders, and deliveries." },
     ],
   }),
   component: MerchantLogin,
@@ -182,7 +182,7 @@ function MerchantLogin() {
         email, otp: code, shop_name: shopName, password
       });
       localStorage.setItem("auth_token", res.data.token);
-      toast.success(`Welcome to UniDrop, ${res.data.shop_name || shopName}! 🏪`);
+      toast.success(`Welcome to Campus Flow, ${res.data.shop_name || shopName}! 🏪`);
       setTimeout(() => navigate({ to: "/merchant" }), 800);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Invalid verification code. Please try again.");
@@ -234,7 +234,7 @@ function MerchantLogin() {
                   <CustomLogo className="h-3.5 w-3.5" />
                 </span>
                 <span className="text-[10px] font-black tracking-widest text-brand flex items-center">
-                  UNIDROP
+                  CAMPUS FLOW
                   <span className="ml-1.5 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded tracking-normal">MERCHANT</span>
                 </span>
               </div>
@@ -291,7 +291,7 @@ function MerchantLogin() {
               </div>
 
               <p className="text-center text-[9px] text-muted-foreground mt-8">
-                By continuing, you agree to UniDrop's{" "}
+                By continuing, you agree to Campus Flow's{" "}
                 <span className="font-semibold text-brand">Terms of Service</span> and{" "}
                 <span className="font-semibold text-brand">Privacy Policy</span>.
               </p>
@@ -309,7 +309,7 @@ function MerchantLogin() {
                   <CustomLogo className="h-3.5 w-3.5" />
                 </span>
                 <span className="text-[10px] font-black tracking-widest text-brand flex items-center">
-                  UNIDROP
+                  CAMPUS FLOW
                   <span className="ml-1.5 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded tracking-normal">MERCHANT</span>
                 </span>
               </div>
@@ -352,7 +352,7 @@ function MerchantLogin() {
                   <CustomLogo className="h-4.5 w-4.5" />
                 </span>
                 <span className="text-sm font-bold tracking-tight flex items-center">
-                  UniDrop
+                  Campus Flow
                   <span className="ml-1.5 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded">MERCHANT</span>
                 </span>
               </div>
@@ -594,7 +594,7 @@ function MerchantLogin() {
                   <div className="mt-6 rounded-xl bg-secondary/50 border border-border p-3.5 flex items-start gap-2.5">
                     <ShieldCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
                     <p className="text-[10px] text-muted-foreground leading-relaxed">
-                      <span className="font-bold text-foreground">Only institution-approved merchants</span> can access the UniDrop merchant portal. Your email confirms your institutional identity.
+                      <span className="font-bold text-foreground">Only institution-approved merchants</span> can access the Campus Flow merchant portal. Your email confirms your institutional identity.
                     </p>
                   </div>
                 </div>

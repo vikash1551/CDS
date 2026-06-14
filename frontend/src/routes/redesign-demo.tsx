@@ -8,8 +8,8 @@ import { categories as staticCategories, products as staticProducts, lendItems a
 export const Route = createFileRoute("/redesign-demo")({
   head: () => ({
     meta: [
-      { title: "UniDrop UI/UX Redesign Demo" },
-      { name: "description", content: "Interactive playground to test the redesigned premium UI system for UniDrop." },
+      { title: "Campus Flow UI/UX Redesign Demo" },
+      { name: "description", content: "Interactive playground to test the redesigned premium UI system for Campus Flow." },
     ],
   }),
   component: RedesignDemo,
@@ -95,7 +95,7 @@ function RedesignDemo() {
                 <Bike className="h-5 w-5" />
               </span>
               <div>
-                <span className="text-base font-bold tracking-tight">UniDrop</span>
+                <span className="text-base font-bold tracking-tight">Campus Flow</span>
                 <span className="block text-[10px] text-muted-foreground font-medium -mt-1">UI/UX Prototype</span>
               </div>
             </div>
@@ -178,7 +178,7 @@ function RedesignDemo() {
                     <span className="text-brand">Get it delivered.</span>
                   </h1>
                   <p className="mt-2 text-sm text-muted-foreground max-w-md">
-                    UniDrop connects quick commerce canteen options, peer lending listings, and student courier networks in one campus system.
+                    Campus Flow connects quick commerce canteen options, peer lending listings, and student courier networks in one campus system.
                   </p>
                 </div>
 
@@ -795,7 +795,7 @@ function RedesignDemo() {
             
             {/* ── FOOTER CHIP ── */}
             <div className="mt-12 mb-6 flex items-center justify-center gap-1.5 rounded-xl border border-dashed border-border py-4 text-[10px] text-muted-foreground">
-              <span>UniDrop Design Sandbox</span>
+              <span>Campus Flow Design Sandbox</span>
               <span>·</span>
               <span>Click sidebar items to preview other screens</span>
             </div>

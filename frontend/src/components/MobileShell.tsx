@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Home, LayoutGrid, Package, MessageCircle, User, LogOut } from "lucide-react";
+import { Home, LayoutGrid, Package, MessageCircle, User, LogOut, BarChart3 } from "lucide-react";
 import type { ReactNode } from "react";
 import { IncomingOrderPopup } from "./IncomingOrderPopup";
 import { GlobalFloatingCart } from "./GlobalFloatingCart";
@@ -9,7 +9,8 @@ const tabs = [
   { to: "/", label: "Home", icon: Home },
   { to: "/store", label: "Browse", icon: LayoutGrid },
   { to: "/orders", label: "Orders", icon: Package },
-  { to: "/track", label: "Messages", icon: MessageCircle },
+  { to: "/admin-reports", label: "Reports", icon: BarChart3 },
+  { to: "/track", label: "Chat", icon: MessageCircle },
   { to: "/profile", label: "Profile", icon: User },
 ] as const;
 
@@ -30,7 +31,7 @@ export function MobileShell({ children }: { children: ReactNode }) {
           <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand text-brand-foreground">
             <CustomLogo className="h-6 w-6" />
           </span>
-          <span className="text-lg font-bold tracking-tight">UniDrop</span>
+          <span className="text-lg font-bold tracking-tight">Campus Flow</span>
         </Link>
         <nav className="mt-8 flex-1 space-y-2">
           {tabs.map((t) => {

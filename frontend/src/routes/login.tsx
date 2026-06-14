@@ -19,7 +19,7 @@ export const Route = createFileRoute("/login")({
   },
   head: () => ({
     meta: [
-      { title: "Welcome to UniDrop" },
+      { title: "Welcome to Campus Flow" },
       { name: "description", content: "Campus logistics & resource sharing network. Order, borrow, and deliver on campus." },
     ],
   }),
@@ -173,7 +173,7 @@ function Login() {
     try {
       const res = await api.post("/auth-verify-otp", { email, otp: code, name, password });
       localStorage.setItem("auth_token", res.data.token);
-      toast.success("Email verified! Welcome to UniDrop 🎓");
+      toast.success("Email verified! Welcome to Campus Flow 🎓");
       setTimeout(() => navigate({ to: "/" }), 800);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Invalid verification code. Please try again.");
@@ -228,7 +228,7 @@ function Login() {
                 <span className="flex h-5 w-5 items-center justify-center rounded-md bg-brand text-brand-foreground">
                   <CustomLogo className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-[10px] font-black tracking-widest text-brand">UNIDROP</span>
+                <span className="text-[10px] font-black tracking-widest text-brand">CAMPUS FLOW</span>
               </div>
             </div>
 
@@ -279,7 +279,7 @@ function Login() {
               </div>
 
               <p className="text-center text-[9px] text-muted-foreground mt-8">
-                By continuing, you agree to UniDrop's{" "}
+                By continuing, you agree to Campus Flow's{" "}
                 <span className="font-semibold text-brand">Terms of Service</span> and{" "}
                 <span className="font-semibold text-brand">Privacy Policy</span>.
               </p>
@@ -296,7 +296,7 @@ function Login() {
                 <span className="flex h-5 w-5 items-center justify-center rounded-md bg-brand text-brand-foreground">
                   <CustomLogo className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-[10px] font-black tracking-widest text-brand">UNIDROP</span>
+                <span className="text-[10px] font-black tracking-widest text-brand">CAMPUS FLOW</span>
               </div>
 
 
@@ -341,7 +341,7 @@ function Login() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-brand-foreground">
                   <CustomLogo className="h-4.5 w-4.5" />
                 </span>
-                <span className="text-sm font-bold tracking-tight">UniDrop</span>
+                <span className="text-sm font-bold tracking-tight">Campus Flow</span>
               </div>
 
               {/* Mode toggle — Login / Sign up */}
@@ -661,7 +661,7 @@ function Login() {
                   <div className="mt-6 rounded-xl bg-secondary/50 border border-border p-3.5 flex items-start gap-2.5">
                     <ShieldCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
                     <p className="text-[10px] text-muted-foreground leading-relaxed">
-                      <span className="font-bold text-foreground">Only verified college students</span> can access UniDrop. Your email confirms your campus identity.
+                      <span className="font-bold text-foreground">Only verified college students</span> can access Campus Flow. Your email confirms your campus identity.
                     </p>
                   </div>
                 </div>

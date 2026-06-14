@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useRunnerStore } from "@/lib/store";
 import { MobileShell } from "@/components/MobileShell";
 import { TopBar } from "@/components/TopBar";
-import { Star, Wallet, Award, Bike, ChevronRight, Settings, ShieldCheck, Heart, X, Palette, User as UserIcon, Camera, Mail, Phone, Save, Sun, Moon, Monitor } from "lucide-react";
+import { Star, Wallet, Award, Bike, ChevronRight, Settings, ShieldCheck, Heart, X, Palette, User as UserIcon, Camera, Mail, Phone, Save, Sun, Moon, Monitor, Globe } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/store";
 
@@ -168,7 +168,8 @@ function Mini({ icon, label, value }: { icon: React.ReactNode; label: string; va
 /* ─── Settings Panel ─── */
 function SettingsPanel({ user, onClose }: { user: any, onClose: () => void }) {
   const [theme, setTheme] = useState<ThemeMode>(getStoredTheme);
-  const [activeTab, setActiveTab] = useState<"appearance" | "profile">("appearance");
+  const [activeTab, setActiveTab] = useState<"appearance" | "profile" | "language">("appearance");
+  const [appLang, setAppLang] = useState<string>(localStorage.getItem("app_lang") || "en");
 
   // Profile fields
   const [name, setName] = useState(user?.name || "");
@@ -196,6 +197,30 @@ function SettingsPanel({ user, onClose }: { user: any, onClose: () => void }) {
     toast.success("Profile updated successfully!");
     onClose();
   };
+
+  const changeLanguage = (langCode: string) => {
+    setAppLang(langCode);
+    localStorage.setItem("app_lang", langCode);
+    
+    // Trigger Google Translate
+    const select = document.querySelector(".goog-te-combo") as HTMLSelectElement;
+    if (select) {
+      select.value = langCode;
+      select.dispatchEvent(new Event("change"));
+    }
+    toast.success("Language updated!");
+  };
+
+  const languages = [
+    { code: "en", label: "English (IN)", flag: "🇮🇳" },
+    { code: "hi", label: "Hindi (हिन्दी)", flag: "🇮🇳" },
+    { code: "ta", label: "Tamil (தமிழ்)", flag: "🇮🇳" },
+    { code: "te", label: "Telugu (తెలుగు)", flag: "🇮🇳" },
+    { code: "gu", label: "Gujarati (ગુજરાતી)", flag: "🇮🇳" },
+    { code: "ml", label: "Malayalam (മലയാളം)", flag: "🇮🇳" },
+    { code: "bn", label: "Bengali (বাংলা)", flag: "🇮🇳" },
+    { code: "ur", label: "Urdu (اردو)", flag: "🇮🇳" }
+  ];
 
   return (
     <>
@@ -227,7 +252,7 @@ function SettingsPanel({ user, onClose }: { user: any, onClose: () => void }) {
 
           {/* Tabs */}
           <div className="mx-5 flex rounded-xl bg-secondary p-1 mb-4">
-            {(["appearance", "profile"] as const).map((tab) => (
+            {(["appearance", "profile", "language"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -237,8 +262,8 @@ function SettingsPanel({ user, onClose }: { user: any, onClose: () => void }) {
                     : "text-muted-foreground"
                 }`}
               >
-                {tab === "appearance" ? <Palette className="h-3.5 w-3.5" /> : <UserIcon className="h-3.5 w-3.5" />}
-                {tab === "appearance" ? "Appearance" : "Profile"}
+                {tab === "appearance" ? <Palette className="h-3.5 w-3.5" /> : tab === "profile" ? <UserIcon className="h-3.5 w-3.5" /> : <Globe className="h-3.5 w-3.5" />}
+                {tab === "appearance" ? "Appearance" : tab === "profile" ? "Profile" : "Language"}
               </button>
             ))}
           </div>
@@ -336,6 +361,36 @@ function SettingsPanel({ user, onClose }: { user: any, onClose: () => void }) {
                 >
                   <Save className="h-4 w-4" /> Save Changes
                 </button>
+              </div>
+            )}
+
+            {activeTab === "language" && (
+              <div className="space-y-4">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Select Language</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {languages.map((l) => (
+                    <button
+                      key={l.code}
+                      onClick={() => changeLanguage(l.code)}
+                      className={`flex items-center gap-3 rounded-xl border-2 p-3 text-left transition-all active:scale-[0.98] ${
+                        appLang === l.code
+                          ? "border-primary bg-primary/5 shadow-sm"
+                          : "border-border bg-card hover:border-primary/30"
+                      }`}
+                    >
+                      <span className="text-2xl">{l.flag}</span>
+                      <div>
+                        <p className="text-sm font-bold text-foreground">{l.label}</p>
+                        {appLang === l.code && <p className="text-[10px] text-primary font-bold">Active</p>}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-4 rounded-xl bg-secondary/50 p-3 text-center">
+                  <p className="text-xs text-muted-foreground font-medium flex items-center justify-center gap-2">
+                    <Globe className="h-4 w-4" /> Instant app translation enabled
+                  </p>
+                </div>
               </div>
             )}
           </div>

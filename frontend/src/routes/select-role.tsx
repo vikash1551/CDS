@@ -5,8 +5,8 @@ import { Zap, ShoppingBag, Bike, ArrowRight, Sparkles } from "lucide-react";
 export const Route = createFileRoute("/select-role")({
   head: () => ({
     meta: [
-      { title: "Choose Your Role — UniDrop" },
-      { name: "description", content: "Select how you want to use UniDrop — order or deliver." },
+      { title: "Choose Your Role — Campus Flow" },
+      { name: "description", content: "Select how you want to use Campus Flow — order or deliver." },
     ],
   }),
   component: SelectRole,
@@ -72,7 +72,7 @@ function SelectRole() {
                 <Zap className="h-5 w-5 text-brand-foreground" strokeWidth={3} />
               </span>
               <span className="text-xl font-bold tracking-tight text-primary-foreground">
-                UniDrop
+                Campus Flow
               </span>
             </div>
           </div>
@@ -98,7 +98,7 @@ function SelectRole() {
         <div className="relative mx-auto max-w-[420px] md:max-w-[540px]">
 
           <h1 className="mt-8 text-3xl font-bold text-primary-foreground md:text-4xl">
-            How will you use<br />UniDrop? 🤔
+            How will you use<br />Campus Flow? 🤔
           </h1>
           <p className="mt-2 text-sm text-primary-foreground/60">
             You can always change this later in settings

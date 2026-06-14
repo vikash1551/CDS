@@ -13,9 +13,9 @@ import campusWelcome from "@/campus_welcome.png";
 export const Route = createFileRoute("/")(({
   head: () => ({
     meta: [
-      { title: "UniDrop — Your campus, delivered." },
+      { title: "Campus Flow — Your campus, delivered." },
       { name: "description", content: "Order from campus shops, lend & borrow gear, and connect with fellow students." },
-      { property: "og:title", content: "UniDrop" },
+      { property: "og:title", content: "Campus Flow" },
       { property: "og:description", content: "Order from campus shops and lend gear to fellow students." },
     ],
   }),
@@ -77,7 +77,7 @@ function Index() {
             <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: '#C76B39' }}>
               <CustomLogo className="h-5 w-5 text-white" />
             </span>
-            <span className="text-lg font-bold tracking-tight" style={{ color: '#A84B22' }}>UNIDROP</span>
+            <span className="text-lg font-bold tracking-tight" style={{ color: '#A84B22' }}>CAMPUS FLOW</span>
           </Link>
 
           {/* Center search (desktop) */}

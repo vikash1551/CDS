@@ -90,15 +90,30 @@ function LendTrack() {
     };
   }, [search.requestId]);
 
-  // Fallback: if no socket events arrive within 3s, use setTimeout
+  // Hackathon Demo: Auto-advance through the timeline to make it "workable"
   useEffect(() => {
-    const fallback = setTimeout(() => {
-      if (activeStep === 1) {
-        setActiveStep(2);
-      }
-    }, 3000);
-    return () => clearTimeout(fallback);
-  }, [activeStep]);
+    if (activeStep < 7) {
+      const delay = activeStep === 2 ? 3500 : 2500; // Wait a bit longer on "AI Match"
+      const timer = setTimeout(() => {
+        setActiveStep(activeStep + 1);
+        
+        // Show realistic toasts during progression
+        if (activeStep === 1) {
+          setLenderInfo({
+            name: lenderName,
+            distance: lenderDistance,
+            rating: lenderRating,
+          });
+        }
+        if (activeStep === 2) toast.success(`Matched with ${lenderName}!`);
+        if (activeStep === 3) toast.success(`${lenderName} is on her way to the spot.`);
+        if (activeStep === 4) toast.info("OTP verified successfully!");
+        if (activeStep === 5) toast.success("Item safely returned.");
+      }, delay);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [activeStep, setActiveStep]);
 
 
 
@@ -137,7 +152,7 @@ function LendTrack() {
                     <p className="mt-1 text-xs text-muted-foreground">{step.desc}</p>
                     
                     {/* Render Match Card if matched */}
-                    {isCurrent && step.id === 2 && lenderInfo && (
+                    {activeStep >= 2 && step.id === 2 && lenderInfo && (
                       <div className="mt-3 flex items-center gap-3 rounded-xl border border-border bg-background p-3 shadow-sm animate-in fade-in slide-in-from-top-2">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-lg">👤</div>
                         <div>

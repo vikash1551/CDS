@@ -105,7 +105,7 @@ function MerchantOrders() {
     toast.success("Order accepted!");
 
     // Broadcast to runners automatically (for real cross-tab flow)
-    const bc = new BroadcastChannel("unidrop-orders");
+    const bc = new BroadcastChannel("campus flow-orders");
     bc.postMessage({ type: "NEW_ORDER", order });
     bc.close();
 

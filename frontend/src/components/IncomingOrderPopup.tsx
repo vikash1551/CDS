@@ -2,10 +2,12 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useRunnerStore } from "@/lib/store";
+import { socketService } from "@/lib/socket";
+import { useAuth } from "@/lib/store";
 import { MapPin, Navigation, Package, Star, Clock, ChevronRight, Check } from "lucide-react";
-
 export function IncomingOrderPopup() {
   const { incomingOrder, setIncomingOrder, isOnline } = useRunnerStore();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const trackRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -13,6 +15,33 @@ export function IncomingOrderPopup() {
   const [accepted, setAccepted] = useState(false);
 
   const THUMB = 56;
+
+  // Listen for real-time new orders
+  useEffect(() => {
+    if (!isOnline) return;
+    
+    const socket = socketService.connect();
+    
+    const handleNewOrder = (data: any) => {
+      setIncomingOrder({
+        id: data.order_id,
+        items: data.items?.map((i: any) => i.name) || ["Package"],
+        pickupLocation: data.pickup_name || "Merchant Shop",
+        dropoffLocation: data.delivery_location || "Campus Zone",
+        pickupDistance: "300m",
+        dropoffDistance: "1.2km",
+        earnings: data.estimated_fee || 15,
+        exp: 20,
+        eta: "10-15 mins"
+      });
+    };
+    
+    socket.on('new_order', handleNewOrder);
+    
+    return () => {
+      socket.off('new_order', handleNewOrder);
+    };
+  }, [isOnline, setIncomingOrder]);
 
   // Sound effect for incoming order (optional visual pulse if sound not playing)
   useEffect(() => {
@@ -49,6 +78,19 @@ export function IncomingOrderPopup() {
     if (dragX > getMaxX() * 0.75) {
       setAccepted(true);
       toast.success("Order accepted! Routing to pickup...");
+      
+      // Hit backend to accept the order
+      if (incomingOrder) {
+        fetch("http://localhost:5001/api/orders/accept-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            order_id: incomingOrder.id,
+            courier_id: user?.id || "demo_courier"
+          })
+        }).catch(console.error);
+      }
+
       setTimeout(() => {
         setIncomingOrder(null);
         setAccepted(false);

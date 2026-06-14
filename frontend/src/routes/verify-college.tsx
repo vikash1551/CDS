@@ -6,8 +6,8 @@ import { COLLEGES } from "../lib/colleges";
 export const Route = createFileRoute("/verify-college")({
   head: () => ({
     meta: [
-      { title: "Verify College — UniDrop" },
-      { name: "description", content: "Select your college to get started on UniDrop." },
+      { title: "Verify College — Campus Flow" },
+      { name: "description", content: "Select your college to get started on Campus Flow." },
     ],
   }),
   component: VerifyCollege,
@@ -47,7 +47,7 @@ function VerifyCollege() {
                 <Zap className="h-5 w-5 text-brand-foreground" strokeWidth={3} />
               </span>
               <span className="text-xl font-bold tracking-tight text-foreground">
-                UniDrop
+                Campus Flow
               </span>
             </div>
           </div>

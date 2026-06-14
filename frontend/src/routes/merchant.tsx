@@ -10,7 +10,7 @@ import { Package, TrendingUp, Clock, Bike, Star, IndianRupee, Bell, ChevronRight
 export const Route = createFileRoute("/merchant")({
   head: () => ({
     meta: [
-      { title: "Lend and Buy Dashboard — UniDrop" },
+      { title: "Lend and Buy Dashboard — Campus Flow" },
       { name: "description", content: "Manage your campus shop, orders, and deliveries." },
     ],
   }),

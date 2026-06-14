@@ -10,7 +10,7 @@ import { socketService } from "@/lib/socket";
 export const Route = createFileRoute("/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications — UniDrop" },
+      { title: "Notifications — Campus Flow" },
       { name: "description", content: "Stay updated with order statuses, lend requests, and campus alerts." },
     ],
   }),

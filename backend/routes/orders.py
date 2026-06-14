@@ -59,9 +59,6 @@ def create_order():
     order['_id'] = str(order['_id'])
     order['created_at'] = order['created_at'].isoformat()
     
-    # Emit socket event for realtime
-    socketio.emit('new_order', {"order_id": order["order_id"], "status": "pending"})
-    
     # Surge pricing
     pending_count = mongo.db.merchant_orders.count_documents({"status": "pending"})
     surge_multiplier = 1.0
@@ -70,10 +67,22 @@ def create_order():
     elif pending_count > 10:
         surge_multiplier = 1.5
         
+    estimated_fee = round(5.0 * surge_multiplier, 2)
+    
+    # Emit socket event for realtime
+    socketio.emit('new_order', {
+        "order_id": order["order_id"],
+        "status": "pending",
+        "items": order["items"],
+        "pickup_name": order["pickup_name"],
+        "delivery_location": order["delivery_location"],
+        "estimated_fee": estimated_fee
+    })
+        
     return jsonify({
         "message": "Order Created Successfully",
         "surge_multiplier": surge_multiplier,
-        "estimated_fee": round(5.0 * surge_multiplier, 2),
+        "estimated_fee": estimated_fee,
         "order": order
     })
 

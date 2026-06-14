@@ -33,7 +33,7 @@ export function MerchantShell({ children }: { children: ReactNode }) {
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-brand-foreground">
             <CustomLogo className="h-5 w-5" />
           </span>
-          <span className="text-lg font-bold tracking-tight">UniDrop <span className="text-[10px] font-semibold text-brand">MERCHANT</span></span>
+          <span className="text-lg font-bold tracking-tight">Campus Flow <span className="text-[10px] font-semibold text-brand">MERCHANT</span></span>
         </Link>
         <nav className="mt-8 flex-1 space-y-1">
           {tabs.map((t) => {

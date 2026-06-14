@@ -12,444 +12,385 @@ import {
   Package,
   BarChart3,
   Loader2,
-  Search,
   ShieldAlert,
   ShieldCheck,
   Shield,
   Sparkles,
-  ArrowRight,
-  Box,
   RefreshCw,
+  IndianRupee,
+  Activity,
+  ListTodo,
+  Lightbulb
 } from "lucide-react";
 
 export const Route = createFileRoute("/merchant-stock-prediction")({
   head: () => ({
     meta: [
-      { title: "AI Stock Prediction — UniDrop" },
+      { title: "AI Inventory Analyzer — Campus Flow" },
       {
         name: "description",
-        content:
-          "AI-powered stock demand prediction for smart inventory management.",
+        content: "Professional AI-powered inventory analysis and demand prediction.",
       },
     ],
   }),
-  component: StockPrediction,
+  component: AIInventoryAnalyzer,
 });
 
-interface Product {
+interface ProductAnalysis {
   name: string;
-  stock: number;
   category: string;
-  product_id: string;
-}
-
-interface Prediction {
-  item: string;
   current_stock: number;
-  predicted_demand_next_7_days: number;
-  risk_level: "LOW" | "MEDIUM" | "HIGH";
-  recommendation: string;
-  confidence_score: number;
-  daily_forecast: number[];
+  weekly_consumption: number;
+  days_remaining: number;
+  demand_growth: string;
+  risk_level: "HIGH" | "MEDIUM" | "LOW";
+  suggested_restock: number;
+  predicted_7_days: number;
+  predicted_30_days: number;
+  price: number;
 }
 
-function StockPrediction() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [selectedItem, setSelectedItem] = useState("");
-  const [prediction, setPrediction] = useState<Prediction | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [loadingProducts, setLoadingProducts] = useState(true);
-  const [animatedDemand, setAnimatedDemand] = useState(0);
+interface DashboardData {
+  health_score: number;
+  health_status: "GOOD" | "WARNING" | "CRITICAL";
+  total_products: number;
+  total_inventory_value: number;
+  high_risk_items: number;
+  medium_risk_items: number;
+  low_risk_items: number;
+  weekly_sales_forecast: number;
+  monthly_sales_forecast: number;
+  potential_revenue_forecast: number;
+  top_selling_product: string;
+  top_selling_growth: string;
+}
 
-  // Fetch product list on mount
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await api.get("/api/prediction-products");
-        if (res.data.products) {
-          setProducts(res.data.products);
-          if (res.data.products.length > 0) {
-            setSelectedItem(res.data.products[0].name);
-          }
-        }
-      } catch {
-        toast.error("Failed to load products");
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+interface AnalysisData {
+  status: string;
+  demo_mode: boolean;
+  message: string;
+  dashboard: DashboardData;
+  insights: string[];
+  priority_actions: string[];
+  products: ProductAnalysis[];
+}
 
-  // Animate demand number on prediction change
-  useEffect(() => {
-    if (!prediction) return;
-    const target = prediction.predicted_demand_next_7_days;
-    const steps = 35;
-    let step = 0;
-    setAnimatedDemand(0);
-    const interval = setInterval(() => {
-      step++;
-      const ease = 1 - Math.pow(1 - step / steps, 3);
-      setAnimatedDemand(Math.round(target * ease));
-      if (step >= steps) clearInterval(interval);
-    }, 20);
-    return () => clearInterval(interval);
-  }, [prediction]);
+function AIInventoryAnalyzer() {
+  const [data, setData] = useState<AnalysisData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handlePredict = async () => {
-    if (!selectedItem) {
-      toast.error("Please select a product first");
-      return;
-    }
-
+  const fetchAnalysis = async () => {
     setLoading(true);
-    setPrediction(null);
-
     try {
-      const res = await api.get(
-        `/api/predict-stock?item=${encodeURIComponent(selectedItem)}`
-      );
+      const res = await api.get("/api/merchant/ai-inventory-analysis");
       if (res.data.status === "success") {
-        setPrediction(res.data);
-        toast.success("Prediction generated!");
+        setData(res.data);
+        if (res.data.demo_mode) {
+          toast.info("Demo Analysis Mode Active", { duration: 3000 });
+        }
       } else {
-        toast.error(res.data.message || "Prediction failed");
+        toast.error("Failed to fetch analysis.");
       }
     } catch {
-      toast.error("Failed to get prediction. Is the backend running?");
+      toast.error("Failed to get analysis. Is the backend running?");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchAnalysis();
+  }, []);
 
   const riskConfig = {
     HIGH: {
       color: "text-red-500",
       bg: "bg-red-500/10",
       border: "border-red-500/20",
-      glow: "shadow-red-500/20",
-      icon: <ShieldAlert className="h-5 w-5" />,
+      icon: <ShieldAlert className="h-4 w-4" />,
       label: "High Risk",
-      barColor: "bg-red-500",
     },
     MEDIUM: {
       color: "text-amber-500",
       bg: "bg-amber-500/10",
       border: "border-amber-500/20",
-      glow: "shadow-amber-500/20",
-      icon: <Shield className="h-5 w-5" />,
+      icon: <Shield className="h-4 w-4" />,
       label: "Medium Risk",
-      barColor: "bg-amber-500",
     },
     LOW: {
       color: "text-green-500",
       bg: "bg-green-500/10",
       border: "border-green-500/20",
-      glow: "shadow-green-500/20",
-      icon: <ShieldCheck className="h-5 w-5" />,
+      icon: <ShieldCheck className="h-4 w-4" />,
       label: "Low Risk",
-      barColor: "bg-green-500",
     },
   };
 
-  const maxForecast = prediction
-    ? Math.max(...prediction.daily_forecast, 1)
-    : 1;
+  const getHealthColor = (score: number) => {
+    if (score >= 80) return "text-green-500";
+    if (score >= 50) return "text-amber-500";
+    return "text-red-500";
+  };
 
-  const dayLabels = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"];
+  const getHealthBg = (score: number) => {
+    if (score >= 80) return "bg-green-500/10 border-green-500/20";
+    if (score >= 50) return "bg-amber-500/10 border-amber-500/20";
+    return "bg-red-500/10 border-red-500/20";
+  };
 
   return (
     <MerchantShell>
-      <TopBar title="AI Stock Prediction" back={false} />
+      <TopBar title="AI Inventory Analyzer" back={false} />
 
-      <div className="px-4 pt-2 pb-6">
-        {/* Hero Section */}
-        <div
-          className="rounded-2xl p-5 mb-5 text-white relative overflow-hidden"
-          style={{
-            background:
-              "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
-          }}
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-blue-500/10 blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-purple-500/10 blur-3xl" />
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur">
-                <Brain className="h-5 w-5 text-blue-400" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold">AI Demand Predictor</h2>
-                <p className="text-[10px] opacity-60">
-                  Powered by Linear Regression · 7-Day Forecast
-                </p>
-              </div>
-            </div>
-            <p className="text-xs opacity-70 mt-2">
-              Select a product and get AI-powered stock demand predictions with
-              risk assessment and restock recommendations.
+      <div className="px-4 pt-2 pb-20 md:pb-6 space-y-4">
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Brain className="h-6 w-6 text-brand" />
+              Inventory Intelligence
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              AI-driven insights & demand forecasting
             </p>
           </div>
-        </div>
-
-        {/* Product Selector */}
-        <div className="rounded-2xl border border-border bg-card p-4 mb-4">
-          <h3 className="text-sm font-bold mb-3 flex items-center gap-1.5">
-            <Package className="h-4 w-4 text-brand" /> Select Product
-          </h3>
-
-          {loadingProducts ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <>
-              <select
-                id="product-selector"
-                value={selectedItem}
-                onChange={(e) => {
-                  setSelectedItem(e.target.value);
-                  setPrediction(null);
-                }}
-                className="w-full rounded-xl border border-border bg-secondary px-3 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/50 appearance-none"
-              >
-                {products.map((p) => (
-                  <option key={p.product_id} value={p.name}>
-                    {p.name} — Stock: {p.stock}
-                  </option>
-                ))}
-              </select>
-
-              <button
-                id="predict-stock-btn"
-                onClick={handlePredict}
-                disabled={loading || !selectedItem}
-                className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl bg-brand text-brand-foreground px-4 py-3 text-sm font-bold transition-all active:scale-[0.98] disabled:opacity-50"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Analyzing data...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    Predict Stock Demand
-                  </>
-                )}
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Prediction Results */}
-        {prediction && (
-          <div
-            className="space-y-4"
-            style={{ animation: "prediction-fade-in 0.5s ease-out" }}
+          <button
+            onClick={fetchAnalysis}
+            disabled={loading}
+            className="flex items-center justify-center gap-2 rounded-xl bg-brand/10 text-brand px-3 py-2 text-xs font-bold transition-all active:scale-[0.98] disabled:opacity-50"
           >
-            {/* Main Stats Row */}
-            <div className="grid grid-cols-2 gap-3">
-              {/* Predicted Demand */}
-              <div className="rounded-2xl border border-border bg-card p-4 text-center">
-                <BarChart3 className="mx-auto h-5 w-5 text-blue-500 mb-2" />
-                <p
-                  className="text-3xl font-bold tabular-nums"
-                  style={{ fontVariantNumeric: "tabular-nums" }}
-                >
-                  {animatedDemand}
-                </p>
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  7-Day Predicted Demand
-                </p>
-              </div>
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
 
-              {/* Risk Level */}
-              <div
-                className={`rounded-2xl border p-4 text-center ${riskConfig[prediction.risk_level].bg} ${riskConfig[prediction.risk_level].border}`}
-              >
-                <div
-                  className={`mx-auto mb-2 ${riskConfig[prediction.risk_level].color}`}
-                >
-                  {riskConfig[prediction.risk_level].icon}
+        {loading && !data ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand/10 mb-4">
+              <Brain className="h-7 w-7 text-brand animate-pulse" />
+            </div>
+            <p className="text-sm font-bold mt-2">Analyzing Inventory...</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Generating insights & demand forecasts
+            </p>
+          </div>
+        ) : data ? (
+          <div className="space-y-4 animate-in fade-in duration-500">
+            {/* Demo Mode Banner */}
+            {data.demo_mode && (
+              <div className="rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-2 flex items-center gap-2 text-blue-500">
+                <Sparkles className="h-4 w-4" />
+                <span className="text-xs font-bold">Demo Analysis Mode Active</span>
+              </div>
+            )}
+
+            {/* Premium Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              
+              {/* Health Score - Main Card */}
+              <div className={`col-span-2 md:col-span-1 rounded-3xl border p-5 flex flex-col items-center justify-center relative overflow-hidden shadow-sm hover:shadow-md transition-all ${getHealthBg(data.dashboard.health_score)}`}>
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                  <Activity className="h-20 w-20" />
                 </div>
-                <p
-                  className={`text-lg font-bold ${riskConfig[prediction.risk_level].color}`}
-                >
-                  {riskConfig[prediction.risk_level].label}
-                </p>
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  Risk Assessment
-                </p>
+                <p className="text-xs font-bold uppercase tracking-widest mb-2 opacity-80 z-10">Health Score</p>
+                <div className="flex items-baseline gap-1 z-10">
+                  <span className={`text-6xl font-black ${getHealthColor(data.dashboard.health_score)} tracking-tighter`}>{data.dashboard.health_score}</span>
+                  <span className="text-lg opacity-60 font-bold">/100</span>
+                </div>
+                <div className={`mt-3 px-4 py-1 rounded-full text-xs font-extrabold tracking-wide ${getHealthColor(data.dashboard.health_score)} bg-background/80 shadow-sm z-10`}>
+                  {data.dashboard.health_status}
+                </div>
+              </div>
+
+              {/* Core Financials */}
+              <div className="col-span-2 md:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-4">
+                {/* Total Inventory Value */}
+                <div className="rounded-3xl border border-border bg-card p-5 flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-3">
+                    <div className="p-2 bg-blue-500/10 rounded-xl text-blue-500"><Package className="h-4 w-4" /></div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider">Inventory Value</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black text-foreground flex items-center">
+                      <IndianRupee className="h-5 w-5 mr-0.5" />
+                      {data.dashboard.total_inventory_value.toLocaleString()}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-1 font-medium">Across {data.dashboard.total_products} products</p>
+                  </div>
+                </div>
+
+                {/* Potential 30D Revenue */}
+                <div className="rounded-3xl border border-border bg-card p-5 flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-3">
+                    <div className="p-2 bg-green-500/10 rounded-xl text-green-500"><IndianRupee className="h-4 w-4" /></div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider">30D Rev Forecast</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black text-foreground flex items-center">
+                      <IndianRupee className="h-5 w-5 mr-0.5" />
+                      {data.dashboard.potential_revenue_forecast.toLocaleString()}
+                    </p>
+                    <p className="text-[10px] text-green-500 flex items-center gap-1 mt-1 font-bold">
+                      <TrendingUp className="h-3 w-3" /> Trending Upwards
+                    </p>
+                  </div>
+                </div>
+
+                {/* 7D vs 30D Volume */}
+                <div className="col-span-2 md:col-span-1 rounded-3xl border border-border bg-card p-5 flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-3">
+                    <div className="p-2 bg-brand/10 rounded-xl text-brand"><BarChart3 className="h-4 w-4" /></div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider">Volume Forecast</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground font-semibold">Weekly</p>
+                      <p className="text-lg font-black">{data.dashboard.weekly_sales_forecast.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground font-semibold">Monthly</p>
+                      <p className="text-lg font-black">{data.dashboard.monthly_sales_forecast.toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Stock vs Demand comparison */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-border bg-card p-3 text-center">
-                <Box className="mx-auto h-4 w-4 text-amber-500 mb-1" />
-                <p className="text-xl font-bold">{prediction.current_stock}</p>
-                <p className="text-[9px] text-muted-foreground">
-                  Current Stock
-                </p>
+            {/* Risk Distribution & Top Product */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              {/* Risk Cards */}
+              <div className="col-span-1 md:col-span-3 grid grid-cols-3 gap-3">
+                <div className="rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-500/10 to-transparent p-4 flex flex-col items-center justify-center relative overflow-hidden group">
+                  <ShieldAlert className="h-6 w-6 text-red-500 mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-2xl font-black text-red-500">{data.dashboard.high_risk_items}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">High Risk</p>
+                </div>
+                <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-transparent p-4 flex flex-col items-center justify-center relative overflow-hidden group">
+                  <Shield className="h-6 w-6 text-amber-500 mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-2xl font-black text-amber-500">{data.dashboard.medium_risk_items}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Medium Risk</p>
+                </div>
+                <div className="rounded-2xl border border-green-500/20 bg-gradient-to-br from-green-500/10 to-transparent p-4 flex flex-col items-center justify-center relative overflow-hidden group">
+                  <ShieldCheck className="h-6 w-6 text-green-500 mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-2xl font-black text-green-500">{data.dashboard.low_risk_items}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Low Risk</p>
+                </div>
               </div>
-              <div className="rounded-2xl border border-border bg-card p-3 text-center">
-                <TrendingUp className="mx-auto h-4 w-4 text-brand mb-1" />
-                <p className="text-xl font-bold">
-                  {Math.round(prediction.confidence_score * 100)}%
-                </p>
-                <p className="text-[9px] text-muted-foreground">
-                  AI Confidence
-                </p>
+
+              {/* Top Product Hero */}
+              <div className="col-span-1 rounded-2xl border border-brand/20 bg-gradient-to-br from-brand/10 to-brand/5 p-5 flex flex-col justify-center relative overflow-hidden group">
+                <div className="absolute -right-4 -top-4 opacity-5 bg-brand h-32 w-32 rounded-full blur-2xl group-hover:bg-brand/20 transition-all duration-500" />
+                <p className="text-[10px] font-bold uppercase tracking-wider text-brand mb-1">Top Performer</p>
+                <p className="text-2xl font-black text-foreground truncate">{data.dashboard.top_selling_product}</p>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="text-xs font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded-md flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" /> {data.dashboard.top_selling_growth}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground font-semibold">Demand Growth</span>
+                </div>
               </div>
             </div>
 
-            {/* Confidence Bar */}
-            <div className="rounded-2xl border border-border bg-card p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-bold flex items-center gap-1.5">
-                  <Brain className="h-3.5 w-3.5 text-purple-500" />
-                  Model Confidence
+            {/* Insights & Actions Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Business Insights Panel */}
+              <div className="rounded-2xl border border-border bg-card overflow-hidden">
+                <div className="bg-blue-500/10 px-4 py-3 flex items-center gap-2 border-b border-border">
+                  <Lightbulb className="h-4 w-4 text-blue-500" />
+                  <h3 className="text-xs font-bold text-blue-500">Business Insights</h3>
+                </div>
+                <div className="p-4 space-y-3">
+                  {data.insights.map((insight, idx) => (
+                    <div key={idx} className="flex gap-2.5">
+                      <div className="mt-0.5 h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0" />
+                      <p className="text-xs leading-relaxed">{insight}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Priority Actions Panel */}
+              <div className="rounded-2xl border border-border bg-card overflow-hidden">
+                <div className="bg-brand/10 px-4 py-3 flex items-center gap-2 border-b border-border">
+                  <ListTodo className="h-4 w-4 text-brand" />
+                  <h3 className="text-xs font-bold text-brand">Priority Actions</h3>
+                </div>
+                <div className="p-4 space-y-3">
+                  {data.priority_actions.map((action, idx) => (
+                    <div key={idx} className="flex gap-2.5 items-start">
+                      <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand/20 text-[9px] font-bold text-brand">
+                        {idx + 1}
+                      </div>
+                      <p className="text-xs font-semibold leading-relaxed">{action}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Product Risk Table */}
+            <div className="rounded-2xl border border-border bg-card overflow-hidden">
+              <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                  Inventory Forecast Details
                 </h3>
-                <span className="text-xs font-bold text-brand">
-                  {Math.round(prediction.confidence_score * 100)}%
+                <span className="text-[10px] text-muted-foreground bg-secondary px-2 py-1 rounded-full font-bold">
+                  {data.products.length} Items
                 </span>
               </div>
-              <div className="h-2.5 rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-1000 ease-out"
-                  style={{
-                    width: `${prediction.confidence_score * 100}%`,
-                    background:
-                      prediction.confidence_score > 0.7
-                        ? "var(--brand)"
-                        : prediction.confidence_score > 0.4
-                          ? "#f59e0b"
-                          : "#ef4444",
-                    animation: "grow-width 1s ease-out",
-                  }}
-                />
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-secondary/50 text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <tr>
+                      <th className="px-4 py-3 font-semibold">Product</th>
+                      <th className="px-4 py-3 font-semibold text-center">Stock</th>
+                      <th className="px-4 py-3 font-semibold text-center">Days Left</th>
+                      <th className="px-4 py-3 font-semibold text-center">Growth</th>
+                      <th className="px-4 py-3 font-semibold">Risk Level</th>
+                      <th className="px-4 py-3 font-semibold text-right">30D Forecast</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {data.products.map((product) => (
+                      <tr key={product.name} className="hover:bg-secondary/20 transition-colors">
+                        <td className="px-4 py-3">
+                          <p className="font-bold text-xs">{product.name}</p>
+                          <p className="text-[9px] text-muted-foreground">{product.category}</p>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="font-bold text-xs">{product.current_stock}</span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`font-bold text-xs ${product.days_remaining < 7 ? 'text-red-500' : ''}`}>
+                            {product.days_remaining}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            product.demand_growth.startsWith('-') ? 'text-red-500 bg-red-500/10' : 'text-green-500 bg-green-500/10'
+                          }`}>
+                            {product.demand_growth}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className={`flex w-fit items-center gap-1 rounded-full px-2 py-1 text-[9px] font-bold ${riskConfig[product.risk_level].bg} ${riskConfig[product.risk_level].color}`}>
+                            {riskConfig[product.risk_level].icon}
+                            {riskConfig[product.risk_level].label}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span className="font-bold text-xs text-brand">{product.predicted_30_days}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            {/* 7-Day Forecast Chart */}
-            <div className="rounded-2xl border border-border bg-card p-4">
-              <h3 className="text-sm font-bold mb-3 flex items-center gap-1.5">
-                <BarChart3 className="h-4 w-4 text-brand" />
-                7-Day Demand Forecast
-              </h3>
-              <div className="flex items-end gap-2 h-28">
-                {prediction.daily_forecast.map((val, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 flex flex-col items-center gap-1"
-                  >
-                    <span className="text-[9px] font-bold text-muted-foreground">
-                      {val}
-                    </span>
-                    <div
-                      className="w-full rounded-t-lg"
-                      style={{
-                        height: `${(val / maxForecast) * 100}%`,
-                        minHeight: "4px",
-                        background:
-                          prediction.risk_level === "HIGH"
-                            ? "rgba(239, 68, 68, 0.7)"
-                            : prediction.risk_level === "MEDIUM"
-                              ? "rgba(245, 158, 11, 0.7)"
-                              : "var(--brand)",
-                        transformOrigin: "bottom",
-                        animation: `grow-bar 0.6s ease-out ${i * 0.08}s both`,
-                      }}
-                    />
-                    <span className="text-[8px] font-semibold text-muted-foreground">
-                      {dayLabels[i]}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Recommendation */}
-            <div
-              className={`rounded-2xl border p-4 ${riskConfig[prediction.risk_level].bg} ${riskConfig[prediction.risk_level].border}`}
-            >
-              <h3
-                className={`text-sm font-bold mb-2 flex items-center gap-1.5 ${riskConfig[prediction.risk_level].color}`}
-              >
-                {prediction.risk_level === "HIGH" ? (
-                  <AlertTriangle className="h-4 w-4" />
-                ) : prediction.risk_level === "MEDIUM" ? (
-                  <RefreshCw className="h-4 w-4" />
-                ) : (
-                  <CheckCircle2 className="h-4 w-4" />
-                )}
-                AI Recommendation
-              </h3>
-              <p className="text-xs leading-relaxed">
-                {prediction.recommendation}
-              </p>
-            </div>
-
-            {/* Re-predict button */}
-            <button
-              onClick={handlePredict}
-              className="w-full flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-bold transition-all hover:bg-secondary/50 active:scale-[0.98]"
-            >
-              <RefreshCw className="h-4 w-4" /> Re-analyze
-            </button>
           </div>
-        )}
-
-        {/* Empty State */}
-        {!prediction && !loading && (
-          <div className="flex flex-col items-center justify-center py-10 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary mb-4">
-              <Search className="h-7 w-7 text-muted-foreground" />
-            </div>
-            <p className="text-sm font-bold">No prediction yet</p>
-            <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">
-              Select a product above and click{" "}
-              <span className="font-bold text-brand">Predict Stock Demand</span>{" "}
-              to get AI-powered insights.
-            </p>
-          </div>
-        )}
-
-        {/* Loading State */}
-        {loading && (
-          <div
-            className="flex flex-col items-center justify-center py-12 text-center"
-            style={{ animation: "prediction-fade-in 0.3s ease-out" }}
-          >
-            <div className="relative">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand/10 mb-4">
-                <Brain className="h-7 w-7 text-brand animate-pulse" />
-              </div>
-              <div className="absolute -inset-2 rounded-3xl bg-brand/5 animate-ping" />
-            </div>
-            <p className="text-sm font-bold mt-2">Analyzing patterns...</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Running linear regression on historical data
-            </p>
-          </div>
-        )}
+        ) : null}
       </div>
-
-      <style>{`
-        @keyframes prediction-fade-in {
-          0% { opacity: 0; transform: translateY(12px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes grow-bar {
-          0% { transform: scaleY(0); }
-          100% { transform: scaleY(1); }
-        }
-        @keyframes grow-width {
-          0% { width: 0%; }
-        }
-      `}</style>
     </MerchantShell>
   );
 }

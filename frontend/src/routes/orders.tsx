@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 export const Route = createFileRoute("/orders")({
   head: () => ({
     meta: [
-      { title: "My Orders — UniDrop" },
+      { title: "My Orders — Campus Flow" },
       { name: "description", content: "View your past orders and reorder favorites." },
     ],
   }),

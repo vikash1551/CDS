@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
     meta: [
-      { title: "Leaderboard — UniDrop" },
+      { title: "Leaderboard — Campus Flow" },
       { name: "description", content: "Campus runner rankings, EXP, and badges." },
     ],
   }),
