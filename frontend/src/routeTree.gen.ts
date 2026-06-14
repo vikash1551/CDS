@@ -19,6 +19,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MerchantTrackingRouteImport } from './routes/merchant-tracking'
+import { Route as MerchantStockPredictionRouteImport } from './routes/merchant-stock-prediction'
 import { Route as MerchantProfileRouteImport } from './routes/merchant-profile'
 import { Route as MerchantProductsRouteImport } from './routes/merchant-products'
 import { Route as MerchantOrdersRouteImport } from './routes/merchant-orders'
@@ -85,6 +86,11 @@ const NotificationsRoute = NotificationsRouteImport.update({
 const MerchantTrackingRoute = MerchantTrackingRouteImport.update({
   id: '/merchant-tracking',
   path: '/merchant-tracking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchantStockPredictionRoute = MerchantStockPredictionRouteImport.update({
+  id: '/merchant-stock-prediction',
+  path: '/merchant-stock-prediction',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MerchantProfileRoute = MerchantProfileRouteImport.update({
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/merchant-orders': typeof MerchantOrdersRoute
   '/merchant-products': typeof MerchantProductsRoute
   '/merchant-profile': typeof MerchantProfileRoute
+  '/merchant-stock-prediction': typeof MerchantStockPredictionRoute
   '/merchant-tracking': typeof MerchantTrackingRoute
   '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/merchant-orders': typeof MerchantOrdersRoute
   '/merchant-products': typeof MerchantProductsRoute
   '/merchant-profile': typeof MerchantProfileRoute
+  '/merchant-stock-prediction': typeof MerchantStockPredictionRoute
   '/merchant-tracking': typeof MerchantTrackingRoute
   '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/merchant-orders': typeof MerchantOrdersRoute
   '/merchant-products': typeof MerchantProductsRoute
   '/merchant-profile': typeof MerchantProfileRoute
+  '/merchant-stock-prediction': typeof MerchantStockPredictionRoute
   '/merchant-tracking': typeof MerchantTrackingRoute
   '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/merchant-orders'
     | '/merchant-products'
     | '/merchant-profile'
+    | '/merchant-stock-prediction'
     | '/merchant-tracking'
     | '/notifications'
     | '/orders'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/merchant-orders'
     | '/merchant-products'
     | '/merchant-profile'
+    | '/merchant-stock-prediction'
     | '/merchant-tracking'
     | '/notifications'
     | '/orders'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/merchant-orders'
     | '/merchant-products'
     | '/merchant-profile'
+    | '/merchant-stock-prediction'
     | '/merchant-tracking'
     | '/notifications'
     | '/orders'
@@ -366,6 +378,7 @@ export interface RootRouteChildren {
   MerchantOrdersRoute: typeof MerchantOrdersRoute
   MerchantProductsRoute: typeof MerchantProductsRoute
   MerchantProfileRoute: typeof MerchantProfileRoute
+  MerchantStockPredictionRoute: typeof MerchantStockPredictionRoute
   MerchantTrackingRoute: typeof MerchantTrackingRoute
   NotificationsRoute: typeof NotificationsRoute
   OrdersRoute: typeof OrdersRoute
@@ -451,6 +464,13 @@ declare module '@tanstack/react-router' {
       path: '/merchant-tracking'
       fullPath: '/merchant-tracking'
       preLoaderRoute: typeof MerchantTrackingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchant-stock-prediction': {
+      id: '/merchant-stock-prediction'
+      path: '/merchant-stock-prediction'
+      fullPath: '/merchant-stock-prediction'
+      preLoaderRoute: typeof MerchantStockPredictionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/merchant-profile': {
@@ -590,6 +610,7 @@ const rootRouteChildren: RootRouteChildren = {
   MerchantOrdersRoute: MerchantOrdersRoute,
   MerchantProductsRoute: MerchantProductsRoute,
   MerchantProfileRoute: MerchantProfileRoute,
+  MerchantStockPredictionRoute: MerchantStockPredictionRoute,
   MerchantTrackingRoute: MerchantTrackingRoute,
   NotificationsRoute: NotificationsRoute,
   OrdersRoute: OrdersRoute,

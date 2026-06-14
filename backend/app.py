@@ -41,6 +41,7 @@ def create_app():
     from routes.merchant_products import merchant_products_bp
     from routes.merchant_orders import merchant_orders_bp
     from routes.merchant_analytics import merchant_analytics_bp
+    from ai_prediction.routes import prediction_bp
     
     app.register_blueprint(orders_bp)
     app.register_blueprint(tracking_bp)
@@ -57,6 +58,7 @@ def create_app():
     app.register_blueprint(merchant_products_bp)
     app.register_blueprint(merchant_orders_bp)
     app.register_blueprint(merchant_analytics_bp)
+    app.register_blueprint(prediction_bp)
     
     # Global Error Handler to ensure the frontend never receives HTML error pages
     @app.errorhandler(Exception)

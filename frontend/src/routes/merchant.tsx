@@ -253,6 +253,7 @@ function Merchant() {
             { label: "Analytics", sub: "↑ 12% revenue", to: "/merchant-analytics", emoji: "📊" },
             { label: "Track Deliveries", sub: "3 in transit", to: "/merchant-tracking", emoji: "🗺️" },
             { label: "Store Profile", sub: "4.8 ★ rating", to: "/merchant-profile", emoji: "🏪" },
+            { label: "AI Predictions", sub: "Stock forecast", to: "/merchant-stock-prediction", emoji: "🤖" },
           ].map((a) => (
             <Link
               key={a.label}
