@@ -144,6 +144,9 @@ def google_login():
 def send_otp():
     data = request.json
     email = data.get('email')
+    # Optional: name and password for registration flow
+    name = data.get('name')
+    password = data.get('password')
     
     if not email:
         return jsonify({"message": "Email is required"}), 400
@@ -153,64 +156,104 @@ def send_otp():
     otp = str(random.randint(100000, 999999))
     
     # Store OTP in db with an expiration time (e.g., 10 minutes)
+    # Optionally store pending registration data alongside the OTP
     expiration = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+    update_fields = {"otp": otp, "expires_at": expiration}
+    if name:
+        update_fields["pending_name"] = name
+    if password:
+        update_fields["pending_password"] = password
+    
     mongo.db.otps.update_one(
         {"email": email},
-        {"$set": {"otp": otp, "expires_at": expiration}},
+        {"$set": update_fields},
         upsert=True
     )
     
     # Always log to console for development/demo ease
     print(f"\n[DEMO] OTP for {email}: {otp}\n")
     
-    # Prepare email content
-    from utils.email import send_email
-    subject = "Your UniDrop Login OTP"
-    text_body = f"Your One-Time Password is: {otp}\nThis will expire in 10 minutes."
-    html_body = f"<h3>Your UniDrop OTP</h3><p>Your One-Time Password is: <strong>{otp}</strong></p><p>This will expire in 10 minutes.</p>"
-    
-    # Attempt to send, but ignore failure for demo
-    send_email(email, subject, text_body, html_body)
-    
-    # Return success regardless for hackathon demo to avoid blocking users
-    return jsonify({
-        "message": "OTP sent successfully (Check backend console if email fails)",
-        "demo_otp": otp # Optionally include in response for even easier testing
-    })
+    # Attempt to send email, but never let it block the response
+    try:
+        from utils.email import send_email
+        subject = "Your UniDrop Verification Code"
+        text_body = f"Your One-Time Password is: {otp}\nThis will expire in 10 minutes."
+        html_body = f"<h3>Your UniDrop OTP</h3><p>Your One-Time Password is: <strong>{otp}</strong></p><p>This will expire in 10 minutes.</p>"
+        send_email(email, subject, text_body, html_body)
+        
+        return jsonify({
+            "message": "OTP sent to your email successfully"
+        })
+    except Exception as e:
+        print(f"[WARN] Email sending failed (using terminal OTP instead): {e}")
+        return jsonify({
+            "message": "Email sending failed. Showing demo OTP.",
+            "demo_otp": otp
+        })
 
-@auth_bp.route('/verify-otp', methods=['POST'])
+@auth_bp.route('/auth-verify-otp', methods=['POST'])
 def verify_otp():
     data = request.json
     email = data.get('email')
     otp = data.get('otp')
+    # Optional: inline name/password for registration-complete flow
+    name_override = data.get('name')
+    password_override = data.get('password')
     
     if not email or not otp:
         return jsonify({"message": "Email and OTP are required"}), 400
         
     # Verify OTP
+    print(f"[DEBUG verify_otp] Received request to verify email: {email}, otp: {otp}")
     otp_record = mongo.db.otps.find_one({
+        "email": email,
+        "otp": str(otp),
+    })
+    
+    print(f"[DEBUG verify_otp] Raw OTP record ignoring expiry: {otp_record}")
+
+    otp_record_valid = mongo.db.otps.find_one({
         "email": email,
         "otp": str(otp),
         "expires_at": {"$gt": datetime.datetime.utcnow()}
     })
+
+    print(f"[DEBUG verify_otp] Valid unexpired OTP record: {otp_record_valid}")
     
-    if not otp_record:
+    if not otp_record_valid:
         return jsonify({"message": "Invalid or expired OTP"}), 401
+    
+    otp_record = otp_record_valid
+    
+    # Resolve name and password: inline overrides > pending stored values > defaults
+    resolved_name = name_override or otp_record.get('pending_name') or email.split('@')[0]
+    resolved_password = password_override or otp_record.get('pending_password') or ''
         
     # Check if user exists, otherwise create
     user = mongo.db.users.find_one({"email": email})
     
     if not user:
+        hashed = generate_password_hash(resolved_password) if resolved_password else ''
         user = {
             "user_id": str(uuid.uuid4()),
             "email": email,
-            "name": email.split('@')[0], # Default name based on email
-            "password": "",  # No password for OTP users
+            "name": resolved_name,
+            "password": hashed,
             "xp": 0,
             "badges": [],
+            "email_verified": True,
             "created_at": datetime.datetime.utcnow()
         }
         mongo.db.users.insert_one(user)
+    else:
+        # If user already exists but didn't have a name/password set, update them
+        update_fields = {"email_verified": True}
+        if resolved_name and not user.get('name'):
+            update_fields['name'] = resolved_name
+        if resolved_password and not user.get('password'):
+            update_fields['password'] = generate_password_hash(resolved_password)
+        if update_fields:
+            mongo.db.users.update_one({"email": email}, {"$set": update_fields})
         
     # Clear the OTP after successful verification
     mongo.db.otps.delete_one({"_id": otp_record["_id"]})
@@ -225,7 +268,7 @@ def verify_otp():
         "message": "OTP Verification successful",
         "token": jwt_token,
         "user": {
-            "name": user.get('name'),
+            "name": user.get('name') or resolved_name,
             "email": user.get('email'),
             "xp": user.get('xp', 0)
         }

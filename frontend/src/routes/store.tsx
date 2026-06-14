@@ -5,8 +5,9 @@ import { useCartStore } from "@/lib/store";
 import { api } from "@/lib/api";
 import { TopBar } from "@/components/TopBar";
 import { MobileShell } from "@/components/MobileShell";
-import { categories, products } from "@/lib/data";
+import { categories, products as staticProducts } from "@/lib/data";
 import { Plus, Clock } from "lucide-react";
+import { useEcosystemStore } from "@/store/ecosystemStore";
 
 export const Route = createFileRoute("/store")({
   head: () => ({
@@ -24,37 +25,21 @@ export const Route = createFileRoute("/store")({
 function Store() {
   const { cat } = Route.useSearch();
   const [active, setActive] = useState<string>(cat);
-  const [dbProducts, setDbProducts] = useState<any[]>([]);
+  const { isStoreOpen, products: liveProducts, fetchInitialState } = useEcosystemStore();
 
   useEffect(() => {
-    const fetchStore = async () => {
-      try {
-        const res = await api.get("/merchant/products");
-        if (res.data.products && res.data.products.length > 0) {
-          const mapped = res.data.products.map((p: any) => ({
-            id: p.product_id,
-            name: p.name,
-            price: p.price,
-            category: p.category || "snacks",
-            shop: "Hostel Canteen",
-            unit: "1 serve",
-            emoji: p.emoji || (p.category === "snacks" ? "🥟" : p.category === "drinks" ? "🧋" : "📦"),
-            bg: "linear-gradient(135deg, oklch(0.9 0.1 20), oklch(0.85 0.1 30))",
-            eta: "5 min"
-          }));
-          
-          // Merge database products with the beautiful static products
-          setDbProducts([...mapped, ...products]);
-        } else {
-          setDbProducts(products);
-        }
-      } catch (err) {
-        // Fallback to static if backend fails
-        setDbProducts(products);
-      }
-    };
-    fetchStore();
-  }, []);
+    setActive(cat);
+  }, [cat]);
+
+  useEffect(() => {
+    fetchInitialState();
+  }, [fetchInitialState]);
+
+  // Merge static UI-friendly products if backend is sparse
+  const dbProducts = [...liveProducts];
+  staticProducts.forEach(sp => {
+    if (!dbProducts.find(p => p.id === sp.id)) dbProducts.push(sp as any);
+  });
 
   const list = active === "all" ? dbProducts : dbProducts.filter((p) => p.category === active);
   
@@ -81,7 +66,7 @@ function Store() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 px-4 pb-6 sm:grid-cols-3 md:grid-cols-3 md:gap-5 md:px-0 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-        {list.map((p) => (
+        {list.map((p: any) => (
           <Link
             to="/product/$id"
             params={{ id: p.id }}
@@ -90,8 +75,15 @@ function Store() {
           >
             <div className="relative flex aspect-square items-center justify-center text-5xl" style={{ background: p.bg }}>
               <span>{p.emoji}</span>
-              <span className="absolute left-2 top-2 rounded-full bg-card/90 px-1.5 py-0.5 text-[10px] font-bold">⚡ {p.eta}</span>
-              {p.mrp && (
+              <span className="absolute left-2 top-2 rounded-full bg-card/90 px-1.5 py-0.5 text-[10px] font-bold shadow-sm">⚡ {p.eta}</span>
+              
+              {p.promotion && (
+                <span className="absolute right-2 top-2 rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white shadow-md animate-pulse">
+                  {p.promotion}
+                </span>
+              )}
+
+              {!p.promotion && p.mrp && (
                 <span className="absolute right-2 top-2 rounded-full bg-success px-1.5 py-0.5 text-[10px] font-bold text-success-foreground">
                   {Math.round(((p.mrp - p.price) / p.mrp) * 100)}% OFF
                 </span>
@@ -105,16 +97,22 @@ function Store() {
                   <span className="text-sm font-bold">₹{p.price}</span>
                   {p.mrp && <span className="text-[10px] text-muted-foreground line-through">₹{p.mrp}</span>}
                 </div>
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    addToCart(p);
-                    toast.success(`Added ${p.name} to cart`);
-                  }}
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-soft transition-transform active:scale-95"
-                >
-                  <Plus className="h-4 w-4" strokeWidth={3} />
-                </button>
+                {(!isStoreOpen || p.available === false || p.stock === 0) ? (
+                  <div className="text-[10px] font-bold text-red-500 uppercase tracking-wide bg-red-50 px-2 py-1 rounded-md">
+                    {!isStoreOpen ? "Closed" : "Out of Stock"}
+                  </div>
+                ) : (
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addToCart(p);
+                      toast.success(`Added ${p.name} to cart`);
+                    }}
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-soft transition-transform active:scale-95"
+                  >
+                    <Plus className="h-4 w-4" strokeWidth={3} />
+                  </button>
+                )}
               </div>
             </div>
           </Link>

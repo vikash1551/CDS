@@ -50,47 +50,47 @@
   --radius: 0.875rem;
 
   /* Base */
-  --background: #FFFFFF;
-  --foreground: oklch(0.18 0.04 280);
+  --background: #FAF7F3;
+  --foreground: #1F2937;
   --card: #FFFFFF;
-  --card-foreground: oklch(0.18 0.04 280);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.04 280);
+  --card-foreground: #1F2937;
+  --popover: #FFFFFF;
+  --popover-foreground: #1F2937;
 
-  /* Brand: deep indigo + electric yellow (Zepto-ish) */
-  --primary: oklch(0.27 0.12 282);
-  --primary-foreground: oklch(0.98 0.01 95);
-  --brand: oklch(0.91 0.18 100);
-  --brand-foreground: oklch(0.2 0.05 280);
+  /* Brand: Burnt Orange campus palette */
+  --primary: #A84B22;
+  --primary-foreground: #FFFFFF;
+  --brand: #C76B39;
+  --brand-foreground: #FFFFFF;
 
-  --secondary: oklch(0.96 0.01 280);
-  --secondary-foreground: oklch(0.22 0.06 282);
-  --muted: oklch(0.96 0.008 280);
-  --muted-foreground: oklch(0.5 0.03 280);
-  --accent: oklch(0.94 0.05 100);
-  --accent-foreground: oklch(0.22 0.06 282);
+  --secondary: #FFF7ED;
+  --secondary-foreground: #A84B22;
+  --muted: #F5F0EB;
+  --muted-foreground: #6B7280;
+  --accent: #E6A15A;
+  --accent-foreground: #1F2937;
 
-  --success: oklch(0.7 0.16 150);
-  --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.82 0.16 70);
-  --warning-foreground: oklch(0.2 0.05 70);
-  --destructive: oklch(0.6 0.22 25);
-  --destructive-foreground: oklch(0.99 0 0);
+  --success: #16A34A;
+  --success-foreground: #FFFFFF;
+  --warning: #F59E0B;
+  --warning-foreground: #1F2937;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
 
-  --border: oklch(0.91 0.01 280);
-  --input: oklch(0.93 0.01 280);
-  --ring: oklch(0.27 0.12 282);
+  --border: #E7E5E4;
+  --input: #E7E5E4;
+  --ring: #A84B22;
 
-  --surface: oklch(0.99 0.005 95);
-  --surface-2: oklch(0.96 0.01 100);
+  --surface: #FAF7F3;
+  --surface-2: #F5F0EB;
 
-  --gradient-brand: linear-gradient(135deg, oklch(0.93 0.18 100) 0%, oklch(0.85 0.16 75) 100%);
-  --gradient-primary: linear-gradient(160deg, oklch(0.32 0.14 282) 0%, oklch(0.22 0.1 280) 100%);
-  --gradient-hero: linear-gradient(180deg, oklch(0.93 0.18 100) 0%, oklch(0.96 0.1 95) 100%);
+  --gradient-brand: linear-gradient(135deg, #C76B39 0%, #E6A15A 100%);
+  --gradient-primary: linear-gradient(160deg, #A84B22 0%, #8B3A18 100%);
+  --gradient-hero: linear-gradient(180deg, #FFF7ED 0%, #FAF7F3 100%);
 
-  --shadow-soft: 0 4px 20px -8px oklch(0.27 0.12 282 / 0.18);
-  --shadow-pop: 0 10px 30px -10px oklch(0.27 0.12 282 / 0.35);
-  --shadow-card: 0 1px 0 oklch(0.91 0.01 280), 0 8px 24px -16px oklch(0.27 0.12 282 / 0.25);
+  --shadow-soft: 0 4px 20px -8px rgba(168, 75, 34, 0.12);
+  --shadow-pop: 0 10px 30px -10px rgba(168, 75, 34, 0.2);
+  --shadow-card: 0 1px 0 #E7E5E4, 0 8px 24px -16px rgba(168, 75, 34, 0.12);
 }
 
 .dark {
@@ -275,51 +275,56 @@
 /* --- Student Theme --- */
 .student-theme {
   --radius: 1rem;
-  --brand: #0F766E; /* Primary */
+  --brand: #C76B39;
   --brand-foreground: #FFFFFF;
-  --primary: #0F766E;
+  --primary: #A84B22;
   --primary-foreground: #FFFFFF;
-  --secondary: #14B8A6; /* Secondary */
-  --secondary-foreground: #FFFFFF;
+  --secondary: #FFF7ED;
+  --secondary-foreground: #A84B22;
   
-  --background: #F8FAFC; /* Background */
-  --foreground: #111827; /* Text */
-  --card: #FFFFFF; /* Cards */
-  --card-foreground: #111827;
+  --background: #FAF7F3;
+  --foreground: #1F2937;
+  --card: #FFFFFF;
+  --card-foreground: #1F2937;
   
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #2DD4BF; /* Accent */
-  --success: #2DD4BF;
+  --muted: #F5F0EB;
+  --muted-foreground: #6B7280;
+  --accent: #E6A15A;
+  --accent-foreground: #1F2937;
+  
+  --border: #E7E5E4;
+  --input: #E7E5E4;
+  --ring: #A84B22;
+  --success: #16A34A;
   --success-foreground: #FFFFFF;
   
-  --surface: #F8FAFC;
-  --surface-2: #F1F5F9;
+  --surface: #FAF7F3;
+  --surface-2: #F5F0EB;
   
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 16px -4px rgba(15, 118, 110, 0.06);
-  --shadow-pop: 0 10px 24px -6px rgba(15, 118, 110, 0.08), 0 8px 16px -6px rgba(15, 118, 110, 0.04);
-  --shadow-card: 0 0 0 1px #E5E7EB, 0 2px 8px -2px rgba(15, 118, 110, 0.04);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 16px -4px rgba(168, 75, 34, 0.06);
+  --shadow-pop: 0 10px 24px -6px rgba(168, 75, 34, 0.08), 0 8px 16px -6px rgba(168, 75, 34, 0.04);
+  --shadow-card: 0 0 0 1px #E7E5E4, 0 2px 8px -2px rgba(168, 75, 34, 0.04);
 }
 
 .student-theme.dark, .student-theme .dark {
-  --brand: #2DD4BF; /* Accent teal in dark mode */
-  --brand-foreground: #111827;
-  --primary: #F8FAFC;
-  --primary-foreground: #0F766E;
-  --secondary: #14B8A6;
+  --brand: #E6A15A;
+  --brand-foreground: #1F2937;
+  --primary: #FAF7F3;
+  --primary-foreground: #A84B22;
+  --secondary: #C76B39;
   --secondary-foreground: #FFFFFF;
   
-  --background: #0F172A;
-  --foreground: #F8FAFC;
-  --card: #1E293B;
-  --card-foreground: #F8FAFC;
+  --background: #1C1412;
+  --foreground: #FAF7F3;
+  --card: #2A1F1A;
+  --card-foreground: #FAF7F3;
   
-  --border: #334155;
-  --input: #334155;
-  --ring: #2DD4BF;
+  --border: #3D2E25;
+  --input: #3D2E25;
+  --ring: #E6A15A;
   
-  --surface: #0F172A;
-  --surface-2: #1E293B;
+  --surface: #1C1412;
+  --surface-2: #2A1F1A;
 }
 
 /* --- Merchant Theme --- */
@@ -372,13 +377,45 @@
 /* --- Auth Theme --- */
 .auth-theme {
   --radius: 1rem;
-  --brand: #0F766E; /* Primary */
+  --brand: #C76B39; /* Warm Orange */
+  --brand-foreground: #FFFFFF;
+  --primary: #A84B22;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFF7ED;
+  --secondary-foreground: #A84B22;
+  --accent: #E6A15A;
+  --accent-foreground: #1F2937;
+  
+  --background: #FAF7F3;
+  --foreground: #1F2937;
+  --card: #FFFFFF;
+  --card-foreground: #1F2937;
+  
+  --border: #E7E5E4;
+  --input: #E7E5E4;
+  --ring: #A84B22;
+  
+  --success: #16A34A;
+  --success-foreground: #FFFFFF;
+  
+  --surface: #FAF7F3;
+  --surface-2: #F5F0EB;
+  
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 16px -4px rgba(168, 75, 34, 0.06);
+  --shadow-pop: 0 10px 24px -6px rgba(168, 75, 34, 0.08), 0 8px 16px -6px rgba(168, 75, 34, 0.04);
+  --shadow-card: 0 0 0 1px #E7E5E4, 0 2px 8px -2px rgba(168, 75, 34, 0.04);
+}
+
+/* --- Merchant Auth Theme --- */
+.merchant-auth-theme {
+  --radius: 1rem;
+  --brand: #0F766E; /* Primary Green */
   --brand-foreground: #FFFFFF;
   --primary: #0F766E;
   --primary-foreground: #FFFFFF;
-  --secondary: #14B8A6; /* Secondary */
+  --secondary: #14B8A6; /* Secondary Green */
   --secondary-foreground: #FFFFFF;
-  --accent: #2DD4BF; /* Accent */
+  --accent: #2DD4BF; /* Accent Green */
   --accent-foreground: #111827;
   
   --background: #F8FAFC;
@@ -402,24 +439,24 @@
 }
 
 /* Dynamic CSS class application for theme states */
-.student-theme .bg-background, .merchant-theme .bg-background, .auth-theme .bg-background { background-color: var(--background); }
-.student-theme .text-foreground, .merchant-theme .text-foreground, .auth-theme .text-foreground { color: var(--foreground); }
-.student-theme .bg-card, .merchant-theme .bg-card, .auth-theme .bg-card { background-color: var(--card); }
-.student-theme .text-card-foreground, .merchant-theme .text-card-foreground, .auth-theme .text-card-foreground { color: var(--card-foreground); }
-.student-theme .border-border, .merchant-theme .border-border, .auth-theme .border-border { border-color: var(--border); }
-.student-theme .bg-primary, .merchant-theme .bg-primary, .auth-theme .bg-primary { background-color: var(--primary); }
-.student-theme .text-primary-foreground, .merchant-theme .text-primary-foreground, .auth-theme .text-primary-foreground { color: var(--primary-foreground); }
-.student-theme .bg-brand, .merchant-theme .bg-brand, .auth-theme .bg-brand { background-color: var(--brand); }
-.student-theme .text-brand-foreground, .merchant-theme .text-brand-foreground, .auth-theme .text-brand-foreground { color: var(--brand-foreground); }
-.student-theme .bg-secondary, .merchant-theme .bg-secondary, .auth-theme .bg-secondary { background-color: var(--secondary); }
-.student-theme .text-secondary-foreground, .merchant-theme .text-secondary-foreground, .auth-theme .text-secondary-foreground { color: var(--secondary-foreground); }
-.student-theme .bg-muted, .merchant-theme .bg-muted, .auth-theme .bg-muted { background-color: var(--muted); }
-.student-theme .text-muted-foreground, .merchant-theme .text-muted-foreground, .auth-theme .text-muted-foreground { color: var(--muted-foreground); }
-.student-theme .bg-accent, .merchant-theme .bg-accent, .auth-theme .bg-accent { background-color: var(--accent); }
-.student-theme .text-accent-foreground, .merchant-theme .text-accent-foreground, .auth-theme .text-accent-foreground { color: var(--accent-foreground); }
-.student-theme .border-input, .merchant-theme .border-input, .auth-theme .border-input { border-color: var(--input); }
-.student-theme .shadow-soft, .merchant-theme .shadow-soft, .auth-theme .shadow-soft { box-shadow: var(--shadow-soft); }
-.student-theme .shadow-pop, .merchant-theme .shadow-pop, .auth-theme .shadow-pop { box-shadow: var(--shadow-pop); }
-.student-theme .shadow-card, .merchant-theme .shadow-card, .auth-theme .shadow-card { box-shadow: var(--shadow-card); }
+.student-theme .bg-background, .merchant-theme .bg-background, .auth-theme .bg-background, .merchant-auth-theme .bg-background { background-color: var(--background); }
+.student-theme .text-foreground, .merchant-theme .text-foreground, .auth-theme .text-foreground, .merchant-auth-theme .text-foreground { color: var(--foreground); }
+.student-theme .bg-card, .merchant-theme .bg-card, .auth-theme .bg-card, .merchant-auth-theme .bg-card { background-color: var(--card); }
+.student-theme .text-card-foreground, .merchant-theme .text-card-foreground, .auth-theme .text-card-foreground, .merchant-auth-theme .text-card-foreground { color: var(--card-foreground); }
+.student-theme .border-border, .merchant-theme .border-border, .auth-theme .border-border, .merchant-auth-theme .border-border { border-color: var(--border); }
+.student-theme .bg-primary, .merchant-theme .bg-primary, .auth-theme .bg-primary, .merchant-auth-theme .bg-primary { background-color: var(--primary); }
+.student-theme .text-primary-foreground, .merchant-theme .text-primary-foreground, .auth-theme .text-primary-foreground, .merchant-auth-theme .text-primary-foreground { color: var(--primary-foreground); }
+.student-theme .bg-brand, .merchant-theme .bg-brand, .auth-theme .bg-brand, .merchant-auth-theme .bg-brand { background-color: var(--brand); }
+.student-theme .text-brand-foreground, .merchant-theme .text-brand-foreground, .auth-theme .text-brand-foreground, .merchant-auth-theme .text-brand-foreground { color: var(--brand-foreground); }
+.student-theme .bg-secondary, .merchant-theme .bg-secondary, .auth-theme .bg-secondary, .merchant-auth-theme .bg-secondary { background-color: var(--secondary); }
+.student-theme .text-secondary-foreground, .merchant-theme .text-secondary-foreground, .auth-theme .text-secondary-foreground, .merchant-auth-theme .text-secondary-foreground { color: var(--secondary-foreground); }
+.student-theme .bg-muted, .merchant-theme .bg-muted, .auth-theme .bg-muted, .merchant-auth-theme .bg-muted { background-color: var(--muted); }
+.student-theme .text-muted-foreground, .merchant-theme .text-muted-foreground, .auth-theme .text-muted-foreground, .merchant-auth-theme .text-muted-foreground { color: var(--muted-foreground); }
+.student-theme .bg-accent, .merchant-theme .bg-accent, .auth-theme .bg-accent, .merchant-auth-theme .bg-accent { background-color: var(--accent); }
+.student-theme .text-accent-foreground, .merchant-theme .text-accent-foreground, .auth-theme .text-accent-foreground, .merchant-auth-theme .text-accent-foreground { color: var(--accent-foreground); }
+.student-theme .border-input, .merchant-theme .border-input, .auth-theme .border-input, .merchant-auth-theme .border-input { border-color: var(--input); }
+.student-theme .shadow-soft, .merchant-theme .shadow-soft, .auth-theme .shadow-soft, .merchant-auth-theme .shadow-soft { box-shadow: var(--shadow-soft); }
+.student-theme .shadow-pop, .merchant-theme .shadow-pop, .auth-theme .shadow-pop, .merchant-auth-theme .shadow-pop { box-shadow: var(--shadow-pop); }
+.student-theme .shadow-card, .merchant-theme .shadow-card, .auth-theme .shadow-card, .merchant-auth-theme .shadow-card { box-shadow: var(--shadow-card); }
 
 

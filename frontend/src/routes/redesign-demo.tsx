@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { 
-  Home, ShoppingBag, Repeat2, MapPin, User, Zap, Star, ShieldCheck, Award, Bike, Clock, Sparkles, Package, CheckCircle2, Navigation, Radio, TrendingUp, Wallet, ChevronRight, Search, Plus, X, Eye, Laptop, Sun, Moon, Info, MessageSquare, ArrowRight, ThumbsUp, DollarSign, ListFilter, Activity
+  Home, ShoppingBag, Repeat2, MapPin, User, Zap, Star, ShieldCheck, Award, Bike, Clock, Sparkles, Package, CheckCircle2, Navigation, Radio, TrendingUp, Wallet, ChevronRight, Search, Plus, X, Eye, Laptop, Sun, Moon, Info, MessageSquare, ArrowRight, ThumbsUp, DollarSign, ListFilter, Activity, Phone
 } from "lucide-react";
 import { categories as staticCategories, products as staticProducts, lendItems as staticLendItems } from "@/lib/data";
 

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from extensions import mongo
+from extensions import mongo, socketio
 import uuid
 import datetime
 import requests
@@ -31,6 +31,27 @@ def generate_emoji():
         
     return jsonify({"emoji": emoji})
 
+@merchant_products_bp.route('/merchant/status', methods=['GET'])
+def get_store_status():
+    status_doc = mongo.db.store_settings.find_one({"setting": "store_status"})
+    is_open = status_doc.get('is_open', True) if status_doc else True
+    return jsonify({"is_open": is_open})
+
+@merchant_products_bp.route('/merchant/status', methods=['POST'])
+@token_required
+def set_store_status(current_user):
+    data = request.json
+    is_open = data.get('is_open', True)
+    
+    mongo.db.store_settings.update_one(
+        {"setting": "store_status"},
+        {"$set": {"is_open": is_open}},
+        upsert=True
+    )
+    
+    socketio.emit('store_status_changed', {"is_open": is_open})
+    return jsonify({"message": "Store status updated", "is_open": is_open})
+
 @merchant_products_bp.route('/merchant/add-product', methods=['POST'])
 @token_required
 def add_product(current_user):
@@ -56,6 +77,7 @@ def add_product(current_user):
     mongo.db.merchant_products.insert_one(product)
     product.pop('_id', None)
     
+    socketio.emit('product_added', {"product": product})
     return jsonify({"message": "Product added successfully", "product": product}), 201
 
 @merchant_products_bp.route('/merchant/products', methods=['GET'])
@@ -70,7 +92,7 @@ def update_product(current_user, product_id):
     data = request.json
     
     update_fields = {}
-    for key in ['name', 'description', 'category', 'price', 'stock', 'image_url', 'emoji', 'ETA', 'is_active']:
+    for key in ['name', 'description', 'category', 'price', 'stock', 'image_url', 'emoji', 'ETA', 'is_active', 'promotion']:
         if key in data:
             update_fields[key] = data[key]
             
@@ -85,6 +107,7 @@ def update_product(current_user, product_id):
     if result.modified_count == 0:
         return jsonify({"message": "Product not found or no changes made"}), 404
         
+    socketio.emit('product_updated', {"product_id": product_id, "updates": update_fields})
     return jsonify({"message": "Product updated successfully"})
 
 @merchant_products_bp.route('/merchant/delete-product/<product_id>', methods=['DELETE'])
@@ -93,4 +116,6 @@ def delete_product(current_user, product_id):
     result = mongo.db.merchant_products.delete_one({"product_id": product_id})
     if result.deleted_count == 0:
         return jsonify({"message": "Product not found"}), 404
+        
+    socketio.emit('product_deleted', {"product_id": product_id})
     return jsonify({"message": "Product deleted successfully"})

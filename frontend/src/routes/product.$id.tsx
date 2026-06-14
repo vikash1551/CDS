@@ -102,7 +102,7 @@ function Product() {
           <button 
             type="button"
             onClick={() => {
-              addToCart({ ...p, qty });
+              addToCart({ ...p, qty } as any);
               toast.success(`Added ${qty} × ${p.name} to cart`);
               navigate({ to: "/cart" });
             }}

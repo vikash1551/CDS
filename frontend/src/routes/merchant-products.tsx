@@ -13,6 +13,7 @@ export const Route = createFileRoute("/merchant-products")({
 type MenuItem = {
   id: string; name: string; price: number; stock: number; available: boolean;
   emoji: string; category: string; popularity: number; eta: string;
+  promotion?: string;
 };
 
 const initialMenu: MenuItem[] = [
@@ -38,6 +39,7 @@ function MerchantProducts() {
   const [formEmoji, setFormEmoji] = useState("📦");
   const [formPrice, setFormPrice] = useState("");
   const [formStock, setFormStock] = useState("");
+  const [formPromotion, setFormPromotion] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
   const fetchProducts = async () => {
@@ -53,7 +55,8 @@ function MerchantProducts() {
           emoji: p.emoji || (p.category === "snacks" ? "🥟" : p.category === "drinks" ? "🧋" : "📦"),
           category: p.category || "snacks",
           popularity: Math.floor(Math.random() * 100),
-          eta: "5 min"
+          eta: "5 min",
+          promotion: p.promotion
         }));
         setMenu(mapped);
       }
@@ -100,8 +103,8 @@ function MerchantProducts() {
     toast.success(`${item?.name} removed`);
   };
 
-  const openAdd = () => { setFormName(""); setFormPrice(""); setFormStock(""); setFormEmoji("📦"); setEditItem(null); setShowAdd(true); };
-  const openEdit = (item: MenuItem) => { setFormName(item.name); setFormPrice(String(item.price)); setFormStock(String(item.stock)); setFormEmoji(item.emoji); setEditItem(item); setShowAdd(true); };
+  const openAdd = () => { setFormName(""); setFormPrice(""); setFormStock(""); setFormPromotion(""); setFormEmoji("📦"); setEditItem(null); setShowAdd(true); };
+  const openEdit = (item: any) => { setFormName(item.name); setFormPrice(String(item.price)); setFormStock(String(item.stock)); setFormPromotion(item.promotion || ""); setFormEmoji(item.emoji); setEditItem(item); setShowAdd(true); };
 
   const generateEmoji = async () => {
     if (!formName.trim()) {
@@ -127,12 +130,12 @@ function MerchantProducts() {
     try {
       if (editItem) {
         await api.put(`/merchant/update-product/${editItem.id}`, {
-          name: formName, price: Number(formPrice), stock: Number(formStock), emoji: formEmoji
+          name: formName, price: Number(formPrice), stock: Number(formStock), emoji: formEmoji, promotion: formPromotion
         });
       } else {
         await api.post("/merchant/add-product", {
           name: formName, price: Number(formPrice), stock: Number(formStock) || 0,
-          category: "snacks", description: "", is_available: true, emoji: formEmoji
+          category: "snacks", description: "", is_available: true, emoji: formEmoji, promotion: formPromotion
         });
       }
     } catch (err) {
@@ -183,7 +186,10 @@ function MerchantProducts() {
               <div className="flex items-center gap-3">
                 <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-2xl">{m.emoji}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold line-clamp-1">{m.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-bold line-clamp-1">{m.name}</p>
+                    {m.promotion && <span className="text-[9px] font-bold text-white bg-blue-500 px-1.5 py-0.5 rounded-sm uppercase tracking-wide">{m.promotion}</span>}
+                  </div>
                   <div className="flex items-center gap-3 mt-0.5 text-[11px] text-muted-foreground">
                     <span className="font-semibold text-foreground">₹{m.price}</span>
                     <span>Stock: {m.stock}</span>
@@ -249,6 +255,10 @@ function MerchantProducts() {
                   <label className="text-[11px] font-semibold text-muted-foreground">Stock</label>
                   <input type="number" value={formStock} onChange={(e) => setFormStock(e.target.value)} placeholder="50" className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-brand" />
                 </div>
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold text-muted-foreground">Promotion (Optional)</label>
+                <input value={formPromotion} onChange={(e) => setFormPromotion(e.target.value)} placeholder="e.g. 20% Off, Flash Sale" className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-brand" />
               </div>
               <button onClick={saveItem} className="w-full rounded-xl bg-brand py-3 text-sm font-bold text-brand-foreground active:scale-[0.98]">
                 {editItem ? "Save Changes" : "Add to Menu"}

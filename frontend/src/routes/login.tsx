@@ -1,13 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { 
-  Mail, Lock, Eye, EyeOff, ArrowRight, User, Phone, Shield, Store, GraduationCap, ShieldCheck, LockKeyhole, ArrowLeft 
+import {
+  Mail, Lock, Eye, EyeOff, ArrowRight, User, Shield,
+  GraduationCap, ShieldCheck, LockKeyhole, ArrowLeft,
+  CheckCircle2, XCircle, RefreshCw, AlertCircle
 } from "lucide-react";
 import { CustomLogo } from "@/components/Logo";
 import campusWelcomeImg from "../campus_welcome.png";
-import merchantWelcomeImg from "../merchant_welcome.png";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -25,72 +26,139 @@ export const Route = createFileRoute("/login")({
   component: Login,
 });
 
+/* ─────────────────────────── helpers ─────────────────────────── */
+const COLLEGE_DOMAINS = [
+  ".edu", ".ac.in", ".edu.in", ".ac.uk", ".edu.au",
+  ".college.in", ".university.in", ".inst.in"
+];
+
+function isCollegeEmail(email: string): boolean {
+  const lower = email.toLowerCase();
+  return COLLEGE_DOMAINS.some((d) => lower.endsWith(d));
+}
+
+interface PasswordStrength {
+  score: number; // 0-4
+  label: string;
+  color: string;
+  checks: { label: string; passed: boolean }[];
+}
+
+function getPasswordStrength(pw: string): PasswordStrength {
+  const checks = [
+    { label: "At least 8 characters", passed: pw.length >= 8 },
+    { label: "One uppercase letter (A-Z)", passed: /[A-Z]/.test(pw) },
+    { label: "One number (0-9)", passed: /[0-9]/.test(pw) },
+    { label: "One special character (!@#$…)", passed: /[^A-Za-z0-9]/.test(pw) },
+  ];
+  const score = checks.filter((c) => c.passed).length;
+  const labels = ["Very Weak", "Weak", "Fair", "Strong", "Very Strong"];
+  const colors = ["#DC2626", "#F97316", "#F59E0B", "#16A34A", "#047857"];
+  return { score, label: labels[score] ?? "Very Weak", color: colors[score] ?? "#DC2626", checks };
+}
+
+/* ─────────────────────────── component ─────────────────────────── */
+type SignupStep = "details" | "otp";
+
 function Login() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const [showForm, setShowForm] = useState(search.showForm || false);
   const [mode, setMode] = useState<"login" | "signup">(search.mode || "login");
-  const [role, setRole] = useState<"student" | "merchant">("student");
-  const isMerchant = role === "merchant";
-  const welcomeImage = isMerchant ? merchantWelcomeImg : campusWelcomeImg;
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  // form fields
+  /* login fields */
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [showLoginPw, setShowLoginPw] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  /* signup – step 1 */
+  const [signupStep, setSignupStep] = useState<SignupStep>("details");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [shopName, setShopName] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false);
 
-  // OTP state (signup only)
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [otpLoading, setOtpLoading] = useState(false);
+  /* signup – step 2 */
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const isLogin = mode === "login";
+  const pwStrength = getPasswordStrength(password);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const collegeEmailValid = emailValid && isCollegeEmail(email);
 
-  const handleSendOtp = async () => {
-    if (!email) return;
-    setOtpLoading(true);
+  /* cooldown timer */
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  /* ── Login handler ── */
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginLoading(true);
     try {
-      const res = await api.post("/send-otp", { email });
-      setOtpSent(true);
-      if (res.data.demo_otp) {
-        toast.success(`OTP sent! Your demo code is: ${res.data.demo_otp}`, { duration: 10000 });
-      } else {
-        toast.success("OTP sent to your email");
-      }
-    } catch (err) {
-      toast.error("Failed to send OTP");
+      const res = await api.post("/login", { email: loginEmail, password: loginPassword });
+      localStorage.setItem("auth_token", res.data.token);
+      toast.success("Welcome back! 🎉");
+      navigate({ to: "/" });
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Invalid email or password");
     } finally {
-      setOtpLoading(false);
+      setLoginLoading(false);
     }
   };
 
+  /* ── Step 1: Validate & send OTP ── */
+  const handleDetailsContinue = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) { toast.error("Please enter your name"); return; }
+    if (!collegeEmailValid) { toast.error("Please use your official college email address"); return; }
+    if (pwStrength.score < 2) { toast.error("Please choose a stronger password"); return; }
+    if (password !== confirmPassword) { toast.error("Passwords don't match"); return; }
+
+    setDetailsLoading(true);
+    try {
+      const res = await api.post("/send-otp", { email, name, password });
+      setResendCooldown(60);
+      setSignupStep("otp");
+      if (res.data.demo_otp) {
+        toast.success(`OTP sent! Demo code: ${res.data.demo_otp}`, { duration: 12000 });
+      } else {
+        toast.success("Verification code sent to your college email 📧");
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  /* ── Step 2: OTP input handlers ── */
   const handleOtpChange = (index: number, value: string) => {
-    if (value.length > 1) value = value.slice(-1);
+    if (value.length > 1) {
+      // Handle paste
+      const digits = value.replace(/\D/g, "").slice(0, 6);
+      const next = [...otp];
+      for (let i = 0; i < digits.length; i++) next[i] = digits[i];
+      setOtp(next);
+      const focusIdx = Math.min(digits.length, 5);
+      otpRefs.current[focusIdx]?.focus();
+      if (digits.length === 6) verifyOtp(digits);
+      return;
+    }
     const next = [...otp];
     next[index] = value;
     setOtp(next);
     if (value && index < 5) otpRefs.current[index + 1]?.focus();
-    if (next.every((d) => d)) {
-      const fullOtp = next.join("");
-      setLoading(true);
-      api.post("/verify-otp", { email, otp: fullOtp })
-        .then(res => {
-          localStorage.setItem("auth_token", res.data.token);
-          setOtpVerified(true);
-          toast.success("OTP Verified!");
-          setTimeout(() => navigate({ to: "/" }), 1000);
-        })
-        .catch(() => toast.error("Invalid OTP"))
-        .finally(() => setLoading(false));
-    }
+    if (next.every((d) => d)) verifyOtp(next.join(""));
   };
 
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
@@ -99,88 +167,77 @@ function Login() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isLogin && password !== confirmPassword) return;
-
-    setLoading(true);
+  const verifyOtp = async (code: string) => {
+    if (otpLoading) return;
+    setOtpLoading(true);
     try {
-      if (isLogin) {
-        const endpoint = isMerchant ? "/merchant/login" : "/login";
-        const res = await api.post(endpoint, { email, password });
-        localStorage.setItem("auth_token", res.data.token);
-        toast.success("Logged in successfully");
-        if (isMerchant) {
-          navigate({ to: "/merchant" });
-        } else {
-          navigate({ to: "/" });
-        }
-      } else {
-        const endpoint = isMerchant ? "/merchant/signup" : "/register";
-        const payload = isMerchant
-          ? { name, email, phone, password, shop_name: shopName, business_type: "canteen" }
-          : { name, email, phone, password, role: "student" };
-        const res = await api.post(endpoint, payload);
-        localStorage.setItem("auth_token", res.data.token);
-        toast.success("Account created!");
-        if (isMerchant) {
-          navigate({ to: "/merchant" });
-        } else {
-          navigate({ to: "/verify-college" });
-        }
-      }
+      const res = await api.post("/auth-verify-otp", { email, otp: code, name, password });
+      localStorage.setItem("auth_token", res.data.token);
+      toast.success("Email verified! Welcome to UniDrop 🎓");
+      setTimeout(() => navigate({ to: "/" }), 800);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "An error occurred");
+      toast.error(err.response?.data?.message || "Invalid verification code. Please try again.");
+      setOtp(["", "", "", "", "", ""]);
+      otpRefs.current[0]?.focus();
     } finally {
-      setLoading(false);
+      setOtpLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0) return;
+    try {
+      const res = await api.post("/send-otp", { email, name, password });
+      setResendCooldown(60);
+      if (res.data.demo_otp) {
+        toast.success(`New OTP sent! Demo code: ${res.data.demo_otp}`, { duration: 12000 });
+      } else {
+        toast.success("New verification code sent!");
+      }
+      setOtp(["", "", "", "", "", ""]);
+      otpRefs.current[0]?.focus();
+    } catch {
+      toast.error("Failed to resend OTP");
     }
   };
 
   const resetSignup = () => {
-    setOtpSent(false);
-    setOtpVerified(false);
+    setSignupStep("details");
     setOtp(["", "", "", "", "", ""]);
   };
 
+  /* ── mode switch ── */
+  const switchMode = (m: "login" | "signup") => {
+    setMode(m);
+    resetSignup();
+  };
+
   return (
-    <div className={`min-h-screen bg-background text-foreground flex items-center justify-center p-0 md:p-6 transition-colors duration-500 ${isMerchant ? "merchant-theme" : "auth-theme"}`}>
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-0 md:p-6 transition-colors duration-500 auth-theme">
       <div className="w-full max-w-[420px] md:max-w-[840px] lg:max-w-[960px] xl:max-w-[1080px] bg-card border border-border/80 md:rounded-[32px] overflow-hidden shadow-pop md:min-h-[600px] flex flex-col md:flex-row animate-in fade-in duration-300">
-        
-        {/* welcome Screen (Before entering form) */}
+
+        {/* ══ WELCOME SCREEN ══ */}
         {!showForm ? (
           <>
-            {/* Campus Illustration Header */}
+            {/* Illustration */}
             <div className="relative h-[280px] sm:h-[320px] md:h-auto w-full md:w-1/2 shrink-0 overflow-hidden">
-              <img 
-                src={welcomeImage} 
-                alt="Campus onboarding illustration" 
-                className="w-full h-full object-cover"
-              />
-              {/* Fade out gradient at bottom of illustration (mobile only) */}
+              <img src={campusWelcomeImg} alt="Campus onboarding illustration" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-card via-card/10 to-transparent md:hidden" />
-              {/* Fade out gradient to the right of illustration (desktop only) */}
               <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-transparent via-card/10 to-card" />
-              
-              {/* Top left badge capsule */}
               <div className="absolute top-6 left-6 flex items-center gap-1.5 rounded-xl bg-card/90 px-3.5 py-2 shadow-soft border border-border/40 backdrop-blur-sm">
                 <span className="flex h-5 w-5 items-center justify-center rounded-md bg-brand text-brand-foreground">
                   <CustomLogo className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-[10px] font-black tracking-widest text-brand">
-                  UNIDROP{isMerchant && <span className="ml-1 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded">MERCHANT</span>}
-                </span>
+                <span className="text-[10px] font-black tracking-widest text-brand">UNIDROP</span>
               </div>
             </div>
 
-            {/* Bottom Panel */}
+            {/* Right panel */}
             <div className="px-6 pb-6 pt-4 md:p-10 flex-1 flex flex-col justify-between animate-in fade-in duration-300 relative">
-              {/* Role Switcher */}
+              {/* Role switcher */}
               <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20">
                 <div className="flex bg-secondary/80 p-0.5 rounded-full border border-border shadow-sm">
-                  <button
-                    type="button"
-                    className="px-3 py-1 rounded-full text-[10px] font-bold bg-brand text-brand-foreground shadow-sm cursor-default"
-                  >
+                  <button type="button" className="px-3 py-1 rounded-full text-[10px] font-bold bg-brand text-brand-foreground shadow-sm cursor-default">
                     Student
                   </button>
                   <button
@@ -195,41 +252,32 @@ function Login() {
 
               <div>
                 <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground leading-snug mt-6 md:mt-4">
-                  {isMerchant ? "Grow your campus business." : "Get anything you need on campus."}
+                  Get anything you need on campus.
                 </h1>
                 <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
-                  {isMerchant 
-                    ? "Fulfill campus orders instantly with our student courier network." 
-                    : "Borrow, order, and receive in minutes. Powered by your student network."}
+                  Borrow, order, and receive in minutes. Powered by your student network.
                 </p>
 
-                {/* Continue button */}
                 <button
                   onClick={() => setShowForm(true)}
                   className="w-full bg-brand text-brand-foreground rounded-xl py-3.5 flex items-center justify-center gap-2 font-bold hover:brightness-105 active:scale-[0.98] transition-all mt-6 shadow-soft cursor-pointer animate-in fade-in animate-duration-300"
                 >
-                  {isMerchant ? <Store className="h-4.5 w-4.5" /> : <GraduationCap className="h-4.5 w-4.5" />}
-                  {isMerchant ? "Continue with Business Email" : "Continue with College Email"}
+                  <GraduationCap className="h-4.5 w-4.5" />
+                  Continue with College Email
                 </button>
 
-                {/* Features columns */}
                 <div className="grid grid-cols-2 gap-2.5 mt-4">
                   <div className="rounded-xl bg-secondary/8 border border-secondary/20 p-3.5 text-center flex flex-col items-center justify-center gap-1">
                     <ShieldCheck className="h-4.5 w-4.5 text-brand" />
-                    <span className="text-[10px] font-bold text-foreground">
-                      Verified Students Only
-                    </span>
+                    <span className="text-[10px] font-bold text-foreground">Verified Students Only</span>
                   </div>
                   <div className="rounded-xl bg-secondary/8 border border-secondary/20 p-3.5 text-center flex flex-col items-center justify-center gap-1">
                     <LockKeyhole className="h-4.5 w-4.5 text-brand" />
-                    <span className="text-[10px] font-bold text-foreground">
-                      Secure OTP Login
-                    </span>
+                    <span className="text-[10px] font-bold text-foreground">Secure OTP Login</span>
                   </div>
                 </div>
               </div>
 
-              {/* Terms disclaimer */}
               <p className="text-center text-[9px] text-muted-foreground mt-8">
                 By continuing, you agree to UniDrop's{" "}
                 <span className="font-semibold text-brand">Terms of Service</span> and{" "}
@@ -238,35 +286,28 @@ function Login() {
             </div>
           </>
         ) : (
-          /* actual Login / SignUp Form view */
+          /* ══ FORM VIEW ══ */
           <>
-            {/* Left illustration on desktop, hidden on mobile */}
+            {/* Left illustration — desktop only */}
             <div className="relative hidden md:block md:w-1/2 shrink-0 overflow-hidden">
-              <img 
-                src={welcomeImage} 
-                alt="Campus onboarding illustration" 
-                className="w-full h-full object-cover"
-              />
+              <img src={campusWelcomeImg} alt="Campus onboarding illustration" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-card/10 to-card" />
               <div className="absolute top-6 left-6 flex items-center gap-1.5 rounded-xl bg-card/90 px-3.5 py-2 shadow-soft border border-border/40 backdrop-blur-sm">
                 <span className="flex h-5 w-5 items-center justify-center rounded-md bg-brand text-brand-foreground">
                   <CustomLogo className="h-3.5 w-3.5" />
                 </span>
-                <span className="text-[10px] font-black tracking-widest text-brand">
-                  UNIDROP{isMerchant && <span className="ml-1 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded">MERCHANT</span>}
-                </span>
+                <span className="text-[10px] font-black tracking-widest text-brand">UNIDROP</span>
               </div>
+
+
             </div>
 
-            {/* Form side */}
-            <div className="flex-1 flex flex-col p-6 md:p-10 justify-between animate-in slide-in-from-right duration-300 relative">
-              {/* Role Switcher */}
+            {/* Form panel */}
+            <div className="flex-1 flex flex-col p-6 md:p-10 justify-start animate-in slide-in-from-right duration-300 relative overflow-y-auto">
+              {/* Role switcher */}
               <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20">
                 <div className="flex bg-secondary/80 p-0.5 rounded-full border border-border shadow-sm">
-                  <button
-                    type="button"
-                    className="px-3 py-1 rounded-full text-[10px] font-bold bg-brand text-brand-foreground shadow-sm cursor-default"
-                  >
+                  <button type="button" className="px-3 py-1 rounded-full text-[10px] font-bold bg-brand text-brand-foreground shadow-sm cursor-default">
                     Student
                   </button>
                   <button
@@ -279,66 +320,127 @@ function Login() {
                 </div>
               </div>
 
-              <div>
-                {/* Back Button */}
-                <button 
-                  onClick={() => setShowForm(false)} 
-                  className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground mb-6 cursor-pointer"
-                >
-                  <ArrowLeft className="h-4 w-4" /> Back to Welcome
-                </button>
+              {/* Back button */}
+              <button
+                onClick={() => {
+                  if (mode === "signup" && signupStep === "otp") {
+                    setSignupStep("details");
+                    setOtp(["", "", "", "", "", ""]);
+                  } else {
+                    setShowForm(false);
+                  }
+                }}
+                className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground mb-5 cursor-pointer w-fit"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                {mode === "signup" && signupStep === "otp" ? "Back to Details" : "Back to Welcome"}
+              </button>
 
-                {/* Logo */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-brand-foreground">
-                      <CustomLogo className="h-4.5 w-4.5" />
-                    </span>
-                    <span className="text-sm font-bold tracking-tight">
-                      UniDrop{isMerchant && <span className="ml-1 text-[8px] font-bold bg-brand/10 text-brand px-1.5 py-0.5 rounded">MERCHANT</span>}
-                    </span>
-                  </div>
-                </div>
+              {/* Logo */}
+              <div className="flex items-center gap-2 mb-5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-brand-foreground">
+                  <CustomLogo className="h-4.5 w-4.5" />
+                </span>
+                <span className="text-sm font-bold tracking-tight">UniDrop</span>
+              </div>
 
-                {/* Title & Subtitle */}
-                <h2 className="text-xl font-bold tracking-tight">
-                  {isLogin ? "Welcome back" : isMerchant ? "Register your shop" : "Join the network"}
-                </h2>
-                <p className="text-xs text-muted-foreground mt-1 mb-5">
-                  {isLogin ? "Sign in to continue" : "Create an account to get started"}
-                </p>
+              {/* Mode toggle — Login / Sign up */}
+              <div className="flex bg-secondary p-1 rounded-xl mb-5">
+                {(["login", "signup"] as const).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => switchMode(m)}
+                    className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                      mode === m ? "bg-card text-foreground shadow-soft" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {m === "login" ? "Log in" : "Sign up"}
+                  </button>
+                ))}
+              </div>
 
-                {/* Mode Toggle Tabs */}
-                <div className="flex bg-secondary p-1 rounded-xl mb-5">
-                  {(["login", "signup"] as const).map((m) => (
-                    <button
-                      key={m}
-                      onClick={() => { setMode(m); resetSignup(); }}
-                      className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                        mode === m 
-                          ? "bg-card text-foreground shadow-soft" 
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {m === "login" ? "Log in" : "Sign up"}
-                    </button>
-                  ))}
-                </div>
+              {/* ───── LOGIN FORM ───── */}
+              {mode === "login" && (
+                <>
+                  <h2 className="text-xl font-bold tracking-tight mb-1">Welcome back</h2>
+                  <p className="text-xs text-muted-foreground mb-5">Sign in to continue to your campus network</p>
 
-                {/* Form Input fields */}
-                <form onSubmit={handleSubmit} className="space-y-3.5">
-                  
-                  {/* Full name (Signup only) */}
-                  {!isLogin && (
+                  <form onSubmit={handleLogin} className="space-y-3.5">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                        {isMerchant ? "Owner Name" : "Full Name"}
-                      </label>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Email Address</label>
+                      <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <input
+                          type="email"
+                          placeholder="you@college.edu"
+                          value={loginEmail}
+                          onChange={(e) => setLoginEmail(e.target.value)}
+                          className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Password</label>
+                        <button type="button" className="text-[10px] font-bold text-brand cursor-pointer">Forgot Password?</button>
+                      </div>
+                      <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
+                        <Lock className="h-4 w-4 text-muted-foreground" />
+                        <input
+                          type={showLoginPw ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
+                          required
+                        />
+                        <button type="button" onClick={() => setShowLoginPw(!showLoginPw)} className="text-muted-foreground">
+                          {showLoginPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={loginLoading}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-xs font-bold text-brand-foreground shadow-soft transition-all active:scale-[0.98] disabled:opacity-40 mt-4 cursor-pointer hover:brightness-105"
+                    >
+                      {loginLoading ? <LoadingDots /> : (<>Log in <ArrowRight className="h-4 w-4" /></>)}
+                    </button>
+                  </form>
+                </>
+              )}
+
+              {/* ───── SIGNUP STEP 1: Account Details ───── */}
+              {mode === "signup" && signupStep === "details" && (
+                <>
+                  {/* Step indicator */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-1.5">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-white">1</span>
+                      <span className="text-[11px] font-semibold text-foreground">Account Details</span>
+                    </div>
+                    <div className="h-px flex-1 bg-border" />
+                    <div className="flex items-center gap-1.5 opacity-40">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-[10px] font-bold text-muted-foreground border border-border">2</span>
+                      <span className="text-[11px] font-semibold text-muted-foreground">Verify Email</span>
+                    </div>
+                  </div>
+
+                  <h2 className="text-xl font-bold tracking-tight mb-1">Create your account</h2>
+                  <p className="text-xs text-muted-foreground mb-4">Join thousands of students on campus</p>
+
+                  <form onSubmit={handleDetailsContinue} className="space-y-3.5">
+                    {/* Full Name */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Full Name</label>
                       <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
                         <User className="h-4 w-4 text-muted-foreground" />
                         <input
                           type="text"
-                          placeholder={isMerchant ? "Ramesh Kumar" : "Aarav Sharma"}
+                          placeholder="Aarav Sharma"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
@@ -346,216 +448,242 @@ function Login() {
                         />
                       </div>
                     </div>
-                  )}
 
-                  {/* Shop Name (Merchant + Signup only) */}
-                  {!isLogin && isMerchant && (
+                    {/* College Email */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Shop / Canteen Name</label>
-                      <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
-                        <Store className="h-4 w-4 text-muted-foreground" />
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">College Email Address</label>
+                      <div className={`flex items-center gap-2 rounded-xl border bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:ring-4 ${
+                        emailTouched && email
+                          ? collegeEmailValid
+                            ? "border-green-400 focus-within:ring-green-400/10"
+                            : "border-red-400 focus-within:ring-red-400/10"
+                          : "border-border/80 focus-within:border-brand focus-within:ring-brand/10"
+                      }`}>
+                        <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
                         <input
-                          type="text"
-                          placeholder="Hostel Canteen · Brew Hub"
-                          value={shopName}
-                          onChange={(e) => setShopName(e.target.value)}
+                          type="email"
+                          placeholder="you@college.edu / you@ac.in"
+                          value={email}
+                          onChange={(e) => { setEmail(e.target.value); setEmailTouched(true); }}
+                          onBlur={() => setEmailTouched(true)}
                           className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
                           required
                         />
+                        {emailTouched && email && (
+                          collegeEmailValid
+                            ? <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                            : <XCircle className="h-4 w-4 text-red-500 shrink-0" />
+                        )}
                       </div>
-                    </div>
-                  )}
-
-                  {/* Email (with OTP badge for Signup) */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Email Address
-                    </label>
-                    <div className="flex items-center gap-2 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <input
-                        type="email"
-                        placeholder={isMerchant ? "shop@campus.in" : "you@college.edu"}
-                        value={email}
-                        onChange={(e) => { setEmail(e.target.value); setOtpSent(false); setOtpVerified(false); }}
-                        className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
-                        required
-                        disabled={!isLogin && otpVerified}
-                      />
-                      {!isLogin && (
-                        otpVerified ? (
-                          <span className="shrink-0 rounded-lg bg-success/15 px-2 py-1 text-[9px] font-extrabold text-success">Verified</span>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={handleSendOtp}
-                            disabled={!email || otpLoading}
-                            className="shrink-0 rounded-lg bg-brand text-brand-foreground px-2.5 py-1 text-[10px] font-bold transition-all disabled:opacity-40 cursor-pointer"
-                          >
-                            {otpLoading ? "Sending" : otpSent ? "Resend" : "Get OTP"}
-                          </button>
-                        )
+                      {emailTouched && email && !collegeEmailValid && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <AlertCircle className="h-3 w-3 text-red-500 shrink-0" />
+                          <p className="text-[10px] text-red-500 font-medium">
+                            {!emailValid ? "Enter a valid email address" : "Please use your official college email address (.edu, .ac.in, .edu.in)"}
+                          </p>
+                        </div>
                       )}
-                    </div>
-                  </div>
-
-                  {/* OTP verify box */}
-                  {!isLogin && otpSent && !otpVerified && (
-                    <div className="space-y-3 rounded-xl border border-border bg-secondary/40 p-3.5 animate-in slide-in-from-top duration-300">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-brand" />
-                        <p className="text-[10px] font-semibold text-foreground">
-                          Enter code sent to <span className="font-bold">{email}</span>
+                      {collegeEmailValid && (
+                        <p className="text-[10px] text-green-600 font-medium mt-1 flex items-center gap-1">
+                          <CheckCircle2 className="h-3 w-3" /> College email verified ✓
                         </p>
-                      </div>
-                      <div className="flex justify-center gap-1.5">
-                        {otp.map((digit, i) => (
-                          <input
-                            key={i}
-                            ref={(el) => { otpRefs.current[i] = el; }}
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={1}
-                            value={digit}
-                            onChange={(e) => handleOtpChange(i, e.target.value)}
-                            onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                            className="h-10 w-9 rounded-lg border border-border bg-background text-center text-sm font-bold outline-none focus:border-brand"
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Phone (Signup only) */}
-                  {!isLogin && (
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Phone Number</label>
-                      <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground font-semibold">+91</span>
-                        <input
-                          type="tel"
-                          placeholder="98765 43210"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
-                          required
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Password */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Password</label>
-                      {isLogin && (
-                        <button type="button" className="text-[10px] font-bold text-brand">
-                          Forgot Password?
-                        </button>
                       )}
                     </div>
-                    <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
-                      <Lock className="h-4 w-4 text-muted-foreground" />
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
-                        required
-                        minLength={6}
-                      />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-muted-foreground">
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* Confirm Password (Signup only) */}
-                  {!isLogin && (
+                    {/* Password */}
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Confirm Password</label>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Create Password</label>
                       <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:border-brand focus-within:ring-4 focus-within:ring-brand/10">
                         <Lock className="h-4 w-4 text-muted-foreground" />
                         <input
-                          type={showConfirmPassword ? "text" : "password"}
+                          type={showPw ? "text" : "password"}
+                          placeholder="Min. 8 characters"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
+                          required
+                        />
+                        <button type="button" onClick={() => setShowPw(!showPw)} className="text-muted-foreground">
+                          {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+
+                      {/* Strength bar */}
+                      {password && (
+                        <div className="mt-2 space-y-2">
+                          <div className="flex gap-1">
+                            {[0, 1, 2, 3].map((i) => (
+                              <div
+                                key={i}
+                                className="h-1 flex-1 rounded-full transition-all duration-300"
+                                style={{ background: i < pwStrength.score ? pwStrength.color : "#E7E5E4" }}
+                              />
+                            ))}
+                          </div>
+                          <p className="text-[10px] font-semibold" style={{ color: pwStrength.color }}>
+                            {pwStrength.label}
+                          </p>
+                          <div className="grid grid-cols-2 gap-1">
+                            {pwStrength.checks.map((c) => (
+                              <div key={c.label} className={`flex items-center gap-1 text-[9px] font-medium ${c.passed ? "text-green-600" : "text-muted-foreground"}`}>
+                                {c.passed ? <CheckCircle2 className="h-2.5 w-2.5 shrink-0" /> : <div className="h-2.5 w-2.5 rounded-full border border-current shrink-0" />}
+                                {c.label}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Confirm Password</label>
+                      <div className={`flex items-center gap-2.5 rounded-xl border bg-white shadow-sm px-3.5 py-2.5 transition-all focus-within:ring-4 ${
+                        confirmPassword && password !== confirmPassword
+                          ? "border-red-400 focus-within:ring-red-400/10"
+                          : confirmPassword && password === confirmPassword
+                            ? "border-green-400 focus-within:ring-green-400/10"
+                            : "border-border/80 focus-within:border-brand focus-within:ring-brand/10"
+                      }`}>
+                        <Lock className="h-4 w-4 text-muted-foreground" />
+                        <input
+                          type={showConfirmPw ? "text" : "password"}
                           placeholder="Re-enter password"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full bg-transparent text-xs outline-none placeholder:text-[#0D746A]/60"
+                          className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground/60"
                           required
-                          minLength={6}
                         />
-                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="text-muted-foreground">
-                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)} className="text-muted-foreground">
+                          {showConfirmPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                       </div>
                       {confirmPassword && password !== confirmPassword && (
-                        <p className="text-[10px] font-semibold text-destructive">Passwords don't match</p>
+                        <p className="text-[10px] font-semibold text-red-500">Passwords don't match</p>
                       )}
+                      {confirmPassword && password === confirmPassword && (
+                        <p className="text-[10px] font-semibold text-green-600">Passwords match ✓</p>
+                      )}
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={detailsLoading || !collegeEmailValid || pwStrength.score < 2 || password !== confirmPassword || !name.trim()}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-xs font-bold text-brand-foreground shadow-soft transition-all active:scale-[0.98] disabled:opacity-40 mt-2 cursor-pointer hover:brightness-105"
+                    >
+                      {detailsLoading ? <LoadingDots /> : (<>Continue <ArrowRight className="h-4 w-4" /></>)}
+                    </button>
+                  </form>
+                </>
+              )}
+
+              {/* ───── SIGNUP STEP 2: OTP Verification ───── */}
+              {mode === "signup" && signupStep === "otp" && (
+                <div className="flex flex-col">
+                  {/* Step indicator */}
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="flex items-center gap-1.5 opacity-50">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-[10px] font-bold text-white">
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                      </span>
+                      <span className="text-[11px] font-semibold text-muted-foreground">Account Details</span>
+                    </div>
+                    <div className="h-px flex-1 bg-brand/40" />
+                    <div className="flex items-center gap-1.5">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-white">2</span>
+                      <span className="text-[11px] font-semibold text-foreground">Verify Email</span>
+                    </div>
+                  </div>
+
+                  {/* Icon + title */}
+                  <div className="flex flex-col items-center text-center mb-6">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand/10 mb-3">
+                      <Shield className="h-8 w-8 text-brand" />
+                    </div>
+                    <h2 className="text-xl font-bold tracking-tight">Verify Your College Email</h2>
+                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed max-w-xs">
+                      We've sent a 6-digit verification code to your college email address.
+                    </p>
+                    <div className="mt-2 flex items-center gap-1.5 bg-brand/8 border border-brand/20 rounded-xl px-3 py-2">
+                      <Mail className="h-3.5 w-3.5 text-brand shrink-0" />
+                      <span className="text-[11px] font-semibold text-brand">{email}</span>
+                    </div>
+                  </div>
+
+                  {/* OTP inputs */}
+                  <div className="flex justify-center gap-2 mb-2">
+                    {otp.map((digit, i) => (
+                      <input
+                        key={i}
+                        ref={(el) => { otpRefs.current[i] = el; }}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        value={digit}
+                        onChange={(e) => handleOtpChange(i, e.target.value)}
+                        onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                        disabled={otpLoading}
+                        className={`h-12 w-11 rounded-xl border text-center text-base font-bold outline-none transition-all focus:border-brand focus:ring-4 focus:ring-brand/15 disabled:opacity-50 ${
+                          digit ? "border-brand bg-brand/5 text-brand" : "border-border bg-background text-foreground"
+                        }`}
+                        autoFocus={i === 0}
+                      />
+                    ))}
+                  </div>
+
+                  {otpLoading && (
+                    <div className="flex items-center justify-center gap-2 mt-3 text-xs text-muted-foreground">
+                      <div className="h-3.5 w-3.5 rounded-full border-2 border-brand border-t-transparent animate-spin" />
+                      Verifying your code…
                     </div>
                   )}
 
-                  {/* Submit button */}
-                  <button
-                    type="submit"
-                    disabled={loading || (!isLogin && !otpVerified) || (!isLogin && password !== confirmPassword)}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-xs font-bold text-brand-foreground shadow-soft transition-all active:scale-[0.98] disabled:opacity-40 mt-4 cursor-pointer"
-                  >
-                    {loading ? (
-                      <span className="flex gap-1">
-                        {[0, 1, 2].map((i) => (
-                          <span key={i} className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" style={{ animationDelay: `${i * 0.15}s` }} />
-                        ))}
-                      </span>
-                    ) : (
-                      <>
-                        {isLogin ? "Log in" : isMerchant ? "Register Shop" : "Create Account"} 
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </button>
-                </form>
+                  {/* Actions */}
+                  <div className="flex flex-col items-center gap-3 mt-5">
+                    <button
+                      onClick={handleResendOtp}
+                      disabled={resendCooldown > 0}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-brand disabled:opacity-40 cursor-pointer transition-all"
+                    >
+                      <RefreshCw className="h-3.5 w-3.5" />
+                      {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : "Resend OTP"}
+                    </button>
 
-                {/* Divider */}
-                <div className="mt-4 flex items-center gap-3">
-                  <div className="h-px flex-1 bg-border" />
-                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Or continue with</span>
-                  <div className="h-px flex-1 bg-border" />
+                    <button
+                      onClick={() => { setSignupStep("details"); setOtp(["", "", "", "", "", ""]); }}
+                      className="text-[11px] text-muted-foreground hover:text-foreground cursor-pointer transition-all underline underline-offset-2"
+                    >
+                      Change Email Address
+                    </button>
+                  </div>
+
+                  {/* Trust note */}
+                  <div className="mt-6 rounded-xl bg-secondary/50 border border-border p-3.5 flex items-start gap-2.5">
+                    <ShieldCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">
+                      <span className="font-bold text-foreground">Only verified college students</span> can access UniDrop. Your email confirms your campus identity.
+                    </p>
+                  </div>
                 </div>
-
-                {/* Google Button */}
-                <button 
-                  type="button"
-                  onClick={() => toast.info("Google Authentication is simulated.")}
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-2.5 text-xs font-semibold hover:bg-secondary transition-colors cursor-pointer"
-                >
-                  <svg className="h-4 w-4" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                  </svg>
-                  Google Account
-                </button>
-              </div>
-
-              {/* Bottom Form Toggles */}
-              <p className="mt-6 text-center text-xs text-muted-foreground">
-                {isLogin ? "New to UniDrop?" : "Already have an account?"}{" "}
-                <button
-                  onClick={() => { setMode(isLogin ? "signup" : "login"); resetSignup(); }}
-                  className="font-bold text-brand hover:underline cursor-pointer"
-                >
-                  {isLogin ? "Create account" : "Log in"}
-                </button>
-              </p>
+              )}
             </div>
           </>
         )}
-
       </div>
     </div>
+  );
+}
+
+function LoadingDots() {
+  return (
+    <span className="flex gap-1">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="h-1.5 w-1.5 rounded-full bg-white animate-pulse"
+          style={{ animationDelay: `${i * 0.15}s` }}
+        />
+      ))}
+    </span>
   );
 }

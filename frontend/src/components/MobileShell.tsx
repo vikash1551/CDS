@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Home, ShoppingBag, Repeat2, MapPin, User, Zap, LogOut } from "lucide-react";
+import { Home, LayoutGrid, Package, MessageCircle, User, LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 import { IncomingOrderPopup } from "./IncomingOrderPopup";
 import { GlobalFloatingCart } from "./GlobalFloatingCart";
@@ -7,10 +7,10 @@ import { CustomLogo } from "@/components/Logo";
 
 const tabs = [
   { to: "/", label: "Home", icon: Home },
-  { to: "/store", label: "Store", icon: ShoppingBag },
-  { to: "/lend", label: "Lend & Borrow", icon: Repeat2 },
-  { to: "/track", label: "Track", icon: MapPin },
-  { to: "/profile", label: "Me", icon: User },
+  { to: "/store", label: "Browse", icon: LayoutGrid },
+  { to: "/orders", label: "Orders", icon: Package },
+  { to: "/track", label: "Messages", icon: MessageCircle },
+  { to: "/profile", label: "Profile", icon: User },
 ] as const;
 
 export function MobileShell({ children }: { children: ReactNode }) {

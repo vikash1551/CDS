@@ -180,8 +180,9 @@ function Track() {
   const isMoving = currentStage === 2 || currentStage === 3;
 
   useEffect(() => {
-    setReceivingOrder(!isDelivered && !isLive);
-  }, [isDelivered, isLive, setReceivingOrder]);
+    // Only set receiving order if we actually have an active order ID and it's not delivered
+    setReceivingOrder(!!activeOrderId && !isDelivered && !isLive);
+  }, [isDelivered, isLive, activeOrderId, setReceivingOrder]);
 
   return (
     <MobileShell>

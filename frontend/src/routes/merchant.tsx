@@ -20,7 +20,8 @@ export const Route = createFileRoute("/merchant")({
 import { useMerchantStore } from "@/store/merchantStore";
 
 function Merchant() {
-  const { isOpen } = useMerchantStore();
+  const { isOpen, setIsOpen } = useMerchantStore();
+  const [showPauseModal, setShowPauseModal] = useState(false);
   const [ordersToday, setOrdersToday] = useState(0);
   const [revenue, setRevenue] = useState(0);
   const [activeDeliveries, setActiveDeliveries] = useState(0);
@@ -46,9 +47,12 @@ function Merchant() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch real incoming orders
-  const fetchLiveOrders = async () => {
+  // Fetch initial store status and live orders
+  const fetchLiveOrdersAndStatus = async () => {
     try {
+      const statusRes = await api.get("/merchant/status");
+      setIsOpen(statusRes.data.is_open);
+
       const res = await api.get("/merchant/orders");
       if (res.data.orders) {
         const mapped = res.data.orders.map((o: any) => ({
@@ -73,14 +77,14 @@ function Merchant() {
   };
 
   useEffect(() => {
-    fetchLiveOrders();
+    fetchLiveOrdersAndStatus();
     
     // Replace polling with WebSocket
     const socket = socketService.connect();
     const handleNewOrder = (data: any) => {
       // Refresh the orders from backend or prepend
       toast.success("📦 New real-time order received!");
-      fetchLiveOrders();
+      fetchLiveOrdersAndStatus();
     };
     
     socket?.on("new_order", handleNewOrder);
@@ -139,8 +143,24 @@ function Merchant() {
             <p className="text-lg font-bold">Hostel Canteen</p>
             <p className="text-[11px] opacity-70">Campus · Ramesh Kumar</p>
           </div>
-          <div className="flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold backdrop-blur">
-            <span className={`h-1.5 w-1.5 rounded-full ${isOpen ? "bg-green-400" : "bg-red-400"}`} /> {isOpen ? "Open" : "Closed"}
+          {/* Interactive Status Toggle */}
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] font-semibold text-white/80 mb-1.5 uppercase tracking-wider">Status</span>
+            <button
+              onClick={async () => {
+                if (isOpen) {
+                  setShowPauseModal(true);
+                } else {
+                  setIsOpen(true);
+                  try { await api.post("/merchant/status", { is_open: true }); } catch (e) {}
+                  toast.success("Store Opened", { description: "You are now receiving new orders." });
+                }
+              }}
+              className={`relative flex items-center h-8 w-[88px] rounded-full p-1 transition-colors duration-300 shadow-sm ${isOpen ? 'bg-green-500 hover:bg-green-400' : 'bg-red-500 hover:bg-red-400'}`}
+            >
+              <div className={`h-6 w-6 rounded-full bg-white shadow-sm transition-transform duration-300 ${isOpen ? 'translate-x-[56px]' : 'translate-x-0'}`} />
+              <span className="absolute left-3 text-[10px] font-bold text-white uppercase">{isOpen ? "On" : "Off"}</span>
+            </button>
           </div>
         </div>
 
@@ -248,6 +268,40 @@ function Merchant() {
           ))}
         </div>
       </div>
+
+      {/* Pause Confirmation Modal */}
+      {showPauseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="w-full max-w-sm rounded-[24px] bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+              <span className="text-xl">⏸️</span>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900">Pause your store?</h3>
+            <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+              Your store will stop receiving new orders until reopened.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <button 
+                onClick={() => setShowPauseModal(false)}
+                className="flex-1 rounded-xl border border-gray-200 bg-white py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  setIsOpen(false);
+                  setShowPauseModal(false);
+                  try { await api.post("/merchant/status", { is_open: false }); } catch (e) {}
+                  toast("Store Paused", { icon: "🔴", description: "You are no longer receiving new orders." });
+                }}
+                className="flex-1 rounded-xl bg-red-500 py-3 text-sm font-bold text-white hover:bg-red-600 shadow-sm transition-colors"
+              >
+                Pause Store
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes fade-up { 0% { opacity:0; transform:translateY(8px); } 100% { opacity:1; transform:translateY(0); } }

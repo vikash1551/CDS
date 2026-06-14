@@ -157,7 +157,7 @@ function LendTrack() {
       </div>      {/* Advance Demo Button (for testing/hackathon purposes) */}
       <div className="p-4 bg-background border-t border-border mb-16 md:mb-0">
         <button 
-          onClick={() => setActiveStep(prev => prev < 7 ? prev + 1 : 1)}
+          onClick={() => setActiveStep(activeStep < 7 ? activeStep + 1 : 1)}
           className="w-full text-xs py-3 bg-secondary text-secondary-foreground rounded-xl font-bold transition active:scale-95"
         >
           [Demo] Simulate next step
